@@ -1,0 +1,31 @@
+{
+  "name": "codius-host",
+  "version": "1.0.0",
+  "description": "Codius smart oracle host for Node.js",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/codius/host.git"
+  },
+  "keywords": [
+    "codius",
+    "javascript",
+    "smart",
+    "oracle",
+    "contracts",
+    "distributed",
+    "autonomous",
+    "trustless",
+    "cloud",
+    "virtual"
+  ],
+  "author": "Stefan Thomas <justmoon@members.fsf.org>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/codius/host/issues"
+  },
+  "homepage": "https://github.com/codius/host"
+}
