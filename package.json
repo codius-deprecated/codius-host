@@ -4,7 +4,7 @@
   "description": "Codius smart oracle host for Node.js",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/.bin/istanbul test --preload-sources ./node_modules/.bin/_mocha -- --reporter spec test/*.js"
   },
   "repository": {
     "type": "git",
@@ -27,5 +27,12 @@
   "bugs": {
     "url": "https://github.com/codius/host/issues"
   },
-  "homepage": "https://github.com/codius/host"
+  "homepage": "https://github.com/codius/host",
+  "devDependencies": {
+    "mocha": "~1.20.1",
+    "sinon": "~1.10.2",
+    "chai": "~1.9.1",
+    "sinon-chai": "~2.5.0",
+    "istanbul": "~0.2.16"
+  }
 }
