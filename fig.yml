@@ -1,0 +1,14 @@
+web:
+  build: .
+  command: node_modules/.bin/forever -w app.js
+  ports:
+   - 2633:2633
+  volumes:
+   - .:/code
+   - ../codius-engine:/usr/local/lib/node_modules/codius-engine
+  links:
+   - db
+db:
+  image: orchardup/postgresql
+  ports:
+    - 5432
