@@ -12,6 +12,7 @@ var FileHash = codiusEngine.FileHash;
 var Engine = codiusEngine.Engine;
 
 var routePostContract = require('./routes/post_contract');
+var routePostToken = require('./routes/post_token');
 
 // Put winston into CLI mode (prettier)
 winston.cli();
@@ -45,10 +46,8 @@ var winstonStream = {write: function (data) {
 }};
 app.use(morgan(nconf.get('log_format'), {stream: winstonStream}))
 
-/**
- * Upload a contract.
- */
 app.post('/contract', routePostContract);
+app.post('/token', routePostToken);
 
 app.listen(nconf.get('http').port);
 

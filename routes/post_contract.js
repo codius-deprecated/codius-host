@@ -4,6 +4,9 @@ var zlib = require('zlib');
 var concat = require('concat-stream');
 var winston = require('winston');
 
+/**
+ * Upload a contract.
+ */
 module.exports = function (req, res) {
   var fileManager = req.app.get('fileManager');
   var gunzip = zlib.createGunzip();
