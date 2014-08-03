@@ -8,6 +8,8 @@ web:
    - ../codius-engine:/usr/local/lib/node_modules/codius-engine
   links:
    - db
+  environment:
+    NODE_ENV: fig
 db:
   image: orchardup/postgresql
   ports:
