@@ -1,7 +1,10 @@
-var nconf = require('nconf');
 var express = require('express');
 var morgan = require('morgan');
 var winston = require('winston');
+var knex = require('knex');
+
+var nconf = require('./lib/config');
+
 var app = express();
 
 var codiusEngine = require('codius-engine');
@@ -12,32 +15,17 @@ var FileHash = codiusEngine.FileHash;
 var Engine = codiusEngine.Engine;
 
 var routePostContract = require('./routes/post_contract');
+var routePostToken = require('./routes/post_token');
 
 // Put winston into CLI mode (prettier)
 winston.cli();
 winston.default.transports.console.level = 'debug';
 
-// First consider commandline arguments and environment variables, respectively.
-nconf.argv().env();
-
-// Then load configuration from a designated file.
-nconf.file({ file: 'config.json' });
-
-// Provide default values for settings not provided above.
-nconf.defaults({
-  'http': {
-    'port': 2633
-  },
-  'log_format': 'dev',
-  'engine': {
-
-  }
-});
-
 var engineConfig = new EngineConfig(nconf.get('engine'));
 var compiler = new Compiler(engineConfig);
 var fileManager = new FileManager(engineConfig);
 
+app.set('compiler', compiler);
 app.set('fileManager', fileManager);
 
 var winstonStream = {write: function (data) {
@@ -45,11 +33,15 @@ var winstonStream = {write: function (data) {
 }};
 app.use(morgan(nconf.get('log_format'), {stream: winstonStream}))
 
-/**
- * Upload a contract.
- */
 app.post('/contract', routePostContract);
+app.post('/token', routePostToken);
 
-app.listen(nconf.get('http').port);
+var db = knex.initialize(nconf.get('db'));
 
-winston.info('Codius host running on port '+nconf.get('http').port);
+app.set('db', db);
+
+db.migrate.latest().then(function () {
+  app.listen(nconf.get('http').port);
+
+  winston.info('Codius host running on port '+nconf.get('http').port);
+}).done();

@@ -29,18 +29,23 @@
   },
   "homepage": "https://github.com/codius/host",
   "devDependencies": {
+    "chai": "~1.9.1",
+    "forever": "^0.11.1",
+    "istanbul": "~0.2.16",
     "mocha": "~1.20.1",
     "sinon": "~1.10.2",
-    "chai": "~1.9.1",
     "sinon-chai": "~2.5.0",
-    "istanbul": "~0.2.16"
+    "sqlite3": "^2.2.4"
   },
   "dependencies": {
-    "codius-engine": "git://github.com/codius/engine.git#master",
+    "base64url": "0.0.6",
+    "codius-engine": "git+ssh://git@github.com:codius/codius-engine.git#master",
     "concat-stream": "^1.4.6",
     "express": "^4.5.1",
+    "knex": "^0.6.22",
     "morgan": "^1.2.2",
     "nconf": "^0.6.9",
+    "pg.js": "^3.4.1",
     "tar-stream": "^0.4.4",
     "winston": "^0.7.3"
   }
