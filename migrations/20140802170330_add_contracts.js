@@ -3,7 +3,7 @@
 exports.up = function(knex, Promise) {
   return knex.schema.createTable('contracts', function (t) {
     t.increments().primary();
-    t.binary('hash');
+    t.string('hash', 64).unique();
   });
 };
 

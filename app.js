@@ -25,6 +25,7 @@ var engineConfig = new EngineConfig(nconf.get('engine'));
 var compiler = new Compiler(engineConfig);
 var fileManager = new FileManager(engineConfig);
 
+app.set('compiler', compiler);
 app.set('fileManager', fileManager);
 
 var winstonStream = {write: function (data) {
@@ -36,6 +37,8 @@ app.post('/contract', routePostContract);
 app.post('/token', routePostToken);
 
 var db = knex.initialize(nconf.get('db'));
+
+app.set('db', db);
 
 db.migrate.latest().then(function () {
   app.listen(nconf.get('http').port);
