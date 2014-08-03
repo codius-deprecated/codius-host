@@ -5,6 +5,8 @@ var concat = require('concat-stream');
 var winston = require('winston');
 var path = require('path');
 
+var Contract = require('../models/contract').model;
+
 /**
  * Upload a contract.
  */
@@ -71,22 +73,21 @@ module.exports = function (req, res, next) {
 
     var contractHash = compiler.compileModule('codius-example-require');
 
-    var db = req.app.get('db');
-    db('contracts').where({hash: contractHash}).count('*').then(function (count) {
-      count = count.shift()['count(*)'];
-      if (!count) {
-        return db.insert({hash: contractHash}).into('contracts');
+    var knex = req.app.get('knex');
+    new Contract({hash: contractHash}).fetch().then(function (contract) {
+      if (contract) {
+        return contract;
       } else {
-        return false;
+        return Contract.forge({
+          hash: contractHash
+        }).save();
       }
-    }).then(function (val) {
-      if (val) {
-        winston.debug('stored contract', contractHash);
-        res.send(204);
-      } else {
-        winston.debug('already have contract', contractHash);
-        res.send(204);
-      }
+    }).then(function (contract) {
+      winston.debug('stored contract', contract.get('hash'));
+      res.json(200, {
+        hash: contract.get('hash'),
+        expires: contract.get('expires')
+      });
     }).catch(function (error) {
       next(error);
     });
