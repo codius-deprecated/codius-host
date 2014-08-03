@@ -31,7 +31,7 @@ module.exports = function (req, res) {
       });
     } else {
       return getUniqueToken().then(function (token) {
-        return Token.forge({token: token, contract: contract.get('id')}).save();
+        return Token.forge({token: token, contract_id: contract.get('id')}).save();
       }).then(function (token) {
         // All done!
         res.json(200, {

@@ -40,6 +40,7 @@
   "dependencies": {
     "base64url": "0.0.6",
     "bookshelf": "^0.7.7",
+    "chalk": "^0.5.1",
     "codius-engine": "git+ssh://git@github.com:codius/codius-engine.git#master",
     "concat-stream": "^1.4.6",
     "express": "^4.5.1",
