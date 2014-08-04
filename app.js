@@ -3,34 +3,16 @@ var morgan = require('morgan');
 var winston = require('winston');
 var chalk = require('chalk');
 
+// Load application components - order matters
 var config = require('./lib/config');
+// Log should be loaded before any components that might log during startup
+var log = require('./lib/log');
 var db = require('./lib/db');
+var engine = require('./lib/engine');
 
 var app = express();
 
-var codiusEngine = require('codius-engine');
-var EngineConfig = codiusEngine.Config;
-var Compiler = codiusEngine.Compiler;
-var FileManager = codiusEngine.FileManager;
-var FileHash = codiusEngine.FileHash;
-var Engine = codiusEngine.Engine;
-
-// Put winston into CLI mode (prettier)
-winston.cli();
-winston.default.transports.console.level = 'debug';
-
-var winstonStream = {write: function (data) {
-  winston.info(data.replace(/\n$/, ''));
-}};
-app.use(morgan(config.get('log_format'), {stream: winstonStream}))
-
-// Boot Codius engine
-
-var engineConfig = new EngineConfig(config.get('engine'));
-engineConfig.logger = winston;
-var compiler = new Compiler(engineConfig);
-var fileManager = new FileManager(engineConfig);
-var engine = new Engine(engineConfig);
+app.use(morgan(config.get('log_format'), {stream: log.winstonStream}))
 
 var routePostContract = require('./routes/post_contract');
 var routePostToken = require('./routes/post_token');
@@ -39,13 +21,12 @@ var routeRunContract = require('./routes/run_contract');
 app.set('config', config);
 app.set('knex', db.knex);
 app.set('bookshelf', db.bookshelf);
-app.set('compiler', compiler);
-app.set('fileManager', fileManager);
-app.set('engine', engine);
+app.set('compiler', engine.compiler);
+app.set('fileManager', engine.fileManager);
+app.set('engine', engine.engine);
 
 app.post('/contract', routePostContract);
 app.post('/token', routePostToken);
-
 app.all('/:token/*', routeRunContract);
 
 db.knex.migrate.latest().then(function () {
