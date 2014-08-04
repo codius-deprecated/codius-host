@@ -27,7 +27,7 @@ module.exports = function (req, res, next) {
 
       var runner = engine.runContract(contractHash, '', function (error, result) {
         winston.debug(contractIdent, chalk.dim('---'), chalk.green("204 No Content"), chalk.dim('(0 bytes)'));
-        res.send(204);
+        if (!res.headersSent) res.send(204);
       });
 
       runner._sandbox._stdout = {
@@ -36,6 +36,8 @@ module.exports = function (req, res, next) {
           winston.debug(contractIdent, chalk.dim('...'),output.replace(/\n$/, ''));
         }
       };
+
+      runner.res = res;
     }
   });
 };

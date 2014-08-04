@@ -71,7 +71,7 @@ module.exports = function (req, res, next) {
       fileManager.storeFileWithHash(event.hash, event.data);
     });
 
-    var contractHash = compiler.compileModule('codius-example-require');
+    var contractHash = compiler.compileModule('');
 
     var knex = req.app.get('knex');
     new Contract({hash: contractHash}).fetch().then(function (contract) {
