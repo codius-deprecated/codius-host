@@ -16,3 +16,7 @@ node app
 ## Now what?
 
 To interact with your Codius host, checkout the [Codius CLI](https://github.com/codius/codius-cli).
+
+## Screenshot
+
+![](http://i.imgur.com/xeenOSM.png)
