@@ -5,7 +5,6 @@ web:
    - 2633:2633
   volumes:
    - .:/code
-   - ../codius-engine:/usr/local/lib/node_modules/codius-engine
   links:
    - db
   environment:
