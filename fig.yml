@@ -1,6 +1,6 @@
 web:
   build: .
-  command: node_modules/.bin/forever -w app.js
+  command: node_modules/.bin/nodemon app.js
   ports:
    - 2633:2633
   volumes:
