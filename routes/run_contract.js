@@ -25,16 +25,13 @@ module.exports = function (token, stream) {
 
       winston.debug(contractIdent, chalk.dim('+++'), 'Incoming connection');
 
-      var runner = engine.engine.runContract(contractHash, function (error, result) {
-        //winston.debug(contractIdent, chalk.dim('---'), chalk.green("204 No Content"), chalk.dim('(0 bytes)'));
-        var listener = runner.getPortListener(config.get('virtual_port'));
+      var runner = engine.engine.runContract(contractHash);
 
-        if (!listener) {
-          console.log('Contract is not (yet) listening');
-        } else {
-          // Pass socket stream to contract
-          listener(stream);
-        }
+      runner.on('portListener', function (event) {
+        if (event.port !== config.get('virtual_port')) return;
+
+        // Pass socket stream to contract
+        event.listener(stream);
 
         // TODO: Why does this not get triggered?
         stream.on('end', function () {
