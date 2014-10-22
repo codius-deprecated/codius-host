@@ -2,6 +2,8 @@ var winston = require('winston');
 var chalk = require('chalk');
 
 var formatter = require('../lib/formatter');
+var engine = require('../lib/engine');
+var config = require('../lib/config');
 
 var Token = require('../models/token').model;
 
@@ -10,24 +12,34 @@ var uniqueRunId = 0;
 /**
  * Run a contract.
  */
-module.exports = function (req, res, next) {
-  var token = req.params.token;
+module.exports = function (token, stream) {
   var runId = uniqueRunId++;
 
   new Token({token: token}).fetch({withRelated: ['contract']}).then(function (token) {
     if (!token) {
-      res.send(404);
+      // TODO: Handle error somehow
     } else {
       var contractHash = token.related('contract').get('hash');
-      var engine = req.app.get('engine');
 
       var contractIdent = formatter.hash(contractHash) + chalk.dim(':' + runId);
 
-      winston.debug(contractIdent, chalk.dim('+++'), chalk.bold(req.method + ' ' + req.url));
+      winston.debug(contractIdent, chalk.dim('+++'), 'Incoming connection');
 
-      var runner = engine.runContract(contractHash, '', function (error, result) {
-        winston.debug(contractIdent, chalk.dim('---'), chalk.green("204 No Content"), chalk.dim('(0 bytes)'));
-        if (!res.headersSent) res.send(204);
+      var runner = engine.engine.runContract(contractHash, function (error, result) {
+        //winston.debug(contractIdent, chalk.dim('---'), chalk.green("204 No Content"), chalk.dim('(0 bytes)'));
+        var listener = runner.getPortListener(config.get('virtual_port'));
+
+        if (!listener) {
+          console.log('Contract is not (yet) listening');
+        } else {
+          // Pass socket stream to contract
+          listener(stream);
+        }
+
+        // TODO: Why does this not get triggered?
+        stream.on('end', function () {
+          winston.debug(contractIdent, chalk.dim('---'), 'Connection ended');
+        });
       });
 
       runner._sandbox._stdout = {
@@ -36,8 +48,6 @@ module.exports = function (req, res, next) {
           winston.debug(contractIdent, chalk.dim('...'),output.replace(/\n$/, ''));
         }
       };
-
-      runner.res = res;
     }
   });
 };

@@ -20,3 +20,17 @@ To interact with your Codius host, checkout the [Codius CLI](https://github.com/
 ## Screenshot
 
 ![](http://i.imgur.com/xeenOSM.png)
+
+# Setting up a local Codius host for testing
+
+In order to use a local Codius host, you need to redirect requests like abcabc-abcabc-abcabc.example.com to your local host. Unfortunately, `/etc/hosts` does not allow you to specify wildcard hosts.
+
+On Ubuntu, an easy way to get around this problem is using `dnsmasq`.
+
+``` sh
+sudo apt-get install dnsmasq
+echo 'address=/localcodius/127.0.0.1' | sudo tee --append /etc/dnsmasq.conf
+sudo /etc/init.d/dnsmasq restart
+```
+
+Afterwards, configure your Codius host to use "localcodius" as its hostname. You'll be able to access local contracts using URLs like https://abcabc-abcabc-abcabc.localcodius:2633.
