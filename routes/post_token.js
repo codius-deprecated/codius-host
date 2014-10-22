@@ -1,5 +1,4 @@
-var crypto = require('crypto');
-var base64url = require('base64url');
+var tokenLib = require('../lib/token');
 
 var Token = require('../models/token').model;
 var Contract = require('../models/contract').model;
@@ -13,7 +12,7 @@ module.exports = function (req, res) {
   var config = req.app.get('config');
 
   function getUniqueToken() {
-    var token = base64url(crypto.pseudoRandomBytes(config.get('token_size')));
+    var token = tokenLib.generateToken();
 
     return new Token({token: token}).fetch().then(function (model) {
       if (model !== null) {
