@@ -16,6 +16,7 @@ var log = require('./lib/log');
 var db = require('./lib/db');
 var engine = require('./lib/engine');
 var tokenLib = require('./lib/token');
+var manager = require('./lib/manager');
 
 var app = express();
 
@@ -23,7 +24,6 @@ app.use(morgan(config.get('log_format'), {stream: log.winstonStream}))
 
 var routePostContract = require('./routes/post_contract');
 var routePostToken = require('./routes/post_token');
-var routeRunContract = require('./routes/run_contract');
 
 app.set('config', config);
 app.set('knex', db.knex);
@@ -72,7 +72,7 @@ db.knex.migrate.latest().then(function () {
     // Indication (SNI)
     if (cleartextStream.servername && tokenLib.TOKEN_REGEX.exec(cleartextStream.servername.split('.')[0])) {
       var token = cleartextStream.servername.split('.')[0]
-      routeRunContract(token, cleartextStream);
+      manager.handleConnection(token, cleartextStream);
 
     // Otherwise it must be meant for the host
     } else {
