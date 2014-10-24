@@ -25,7 +25,7 @@ module.exports = function (req, res) {
   new Contract({hash: req.query.contract}).fetch().then(function (contract) {
     if (!contract) {
       // Contract doesn't exist
-      res.json(400, {
+      res.status(400).json({
         message: "Unknown contract hash"
       });
     } else {
@@ -33,7 +33,7 @@ module.exports = function (req, res) {
         return Token.forge({token: token, contract_id: contract.get('id')}).save();
       }).then(function (token) {
         // All done!
-        res.json(200, {
+        res.status(200).json({
           token: token.get('token')
         });
       });

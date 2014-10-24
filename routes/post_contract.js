@@ -84,7 +84,7 @@ module.exports = function (req, res, next) {
       }
     }).then(function (contract) {
       winston.debug('stored contract', contract.get('hash'));
-      res.json(200, {
+      res.status(200).json({
         hash: contract.get('hash'),
         expires: contract.get('expires')
       });
