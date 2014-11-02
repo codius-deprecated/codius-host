@@ -23,6 +23,16 @@ To interact with your Codius host, checkout the [Codius CLI](https://github.com/
 
 # Setting up a local Codius host for testing
 
+## Certificate
+
+First, you need to generate a self-signed certificate. For example, using OpenSSL:
+
+``` sh
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout server.key -out server.crt
+```
+
+## Hostname
+
 In order to use a local Codius host, you need to redirect requests like abcabc-abcabc-abcabc.example.com to your local host. Unfortunately, `/etc/hosts` does not allow you to specify wildcard hosts.
 
 On Ubuntu, an easy way to get around this problem is using `dnsmasq`.
