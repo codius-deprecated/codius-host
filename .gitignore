@@ -11,3 +11,7 @@ node_modules
 
 # Development database
 dev.sqlite3
+
+# SSL keys
+/server.key
+/server.crt
