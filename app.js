@@ -35,25 +35,17 @@ app.set('engine', engine.engine);
 app.post('/contract', routePostContract);
 app.post('/token', routePostToken);
 
-app.listenAsync = Promise.promisify(app.listen);
-
-var unique = 0, internalSocketPath;
+var unique = 0, internalServer;
 // Run migrations
 db.knex.migrate.latest().then(function () {
   // This is the internal HTTP server. External people will not connect to
   // this directly. Instead, they will connect to our TLS port and if they
   // weren't specifying a token, we'll assume they want to talk to the host
   // and route the request to this HTTP server.
-  var pathPrefix = config.get('internal_http').path;
 
-  // Find an unused socket path
-  // TODO: Clean up previously used sockets
-  do {
-    internalSocketPath = pathPrefix + '.' + unique++ + '.sock';
-  } while (fs.existsSync(internalSocketPath));
-
-  // Listen on internal server
-  return app.listenAsync(internalSocketPath);
+  // A port value of zero means a randomly assigned port
+  internalServer = http.createServer(app);
+  return Promise.promisifyAll(internalServer).listenAsync(0, '127.0.0.1');
 }).then(function () {
   // Create public-facing (TLS) server
   var tlsServer = tls.createServer({
@@ -63,9 +55,9 @@ db.knex.migrate.latest().then(function () {
   tlsServer.listen(config.get('port'), function () {
     winston.info('Codius host running on port '+config.get('port'));
   });
+  var internalServerAddress = internalServer.address();
 
   tlsServer.on('secureConnection', function (cleartextStream) {
-    console.log(cleartextStream.servername);
     // Is this connection meant for a contract?
     //
     // We determine the contract being addressed using the Server Name
@@ -77,7 +69,8 @@ db.knex.migrate.latest().then(function () {
     // Otherwise it must be meant for the host
     } else {
       // Create a connection to the internal HTTP server
-      var client = net.connect(internalSocketPath);
+      var client = net.connect(internalServerAddress.port,
+                               internalServerAddress.address);
 
       // And just bidirectionally associate it with the incoming cleartext connection.
       cleartextStream.pipe(client);
