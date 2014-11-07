@@ -22,6 +22,7 @@ var app = express();
 
 app.use(morgan(config.get('log_format'), {stream: log.winstonStream}))
 
+var routeGetHealth = require('./routes/get_health');
 var routePostContract = require('./routes/post_contract');
 var routePostToken = require('./routes/post_token');
 
@@ -32,6 +33,7 @@ app.set('compiler', engine.compiler);
 app.set('fileManager', engine.fileManager);
 app.set('engine', engine.engine);
 
+app.get('/health', routeGetHealth);
 app.post('/contract', routePostContract);
 app.post('/token', routePostToken);
 
