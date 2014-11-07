@@ -51,8 +51,9 @@ db.knex.migrate.latest().then(function () {
 }).then(function () {
   // Create public-facing (TLS) server
   var tlsServer = tls.createServer({
-    key: fs.readFileSync(path.resolve(__dirname, 'server.key')),
-    cert: fs.readFileSync(path.resolve(__dirname, 'server.crt'))
+    ca: config.get('ssl').ca && fs.readFileSync(config.get('ssl').ca),
+    key: fs.readFileSync(config.get('ssl').key),
+    cert: fs.readFileSync(config.get('ssl').cert)
   });
   tlsServer.listen(config.get('port'), function () {
     winston.info('Codius host running on port '+config.get('port'));
