@@ -15,3 +15,4 @@ dev.sqlite3
 # SSL keys
 /server.key
 /server.crt
+.elasticbeanstalk/

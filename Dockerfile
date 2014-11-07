@@ -10,4 +10,7 @@ RUN npm install --no-color
 # Add rest of application
 ADD . /code
 
+ENV PORT 8080
+EXPOSE 8080
+
 CMD npm start
