@@ -41,7 +41,7 @@
     "bluebird": "^2.3.6",
     "bookshelf": "^0.7.7",
     "chalk": "^0.5.1",
-    "codius-engine": "codius/engine#master",
+    "codius-engine": "https://github.com/codius/codius-engine/tarball/master",
     "concat-stream": "^1.4.6",
     "express": "^4.5.1",
     "knex": "^0.6.22",
