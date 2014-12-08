@@ -16,3 +16,8 @@ dev.sqlite3
 /server.key
 /server.crt
 .elasticbeanstalk/
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
