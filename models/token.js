@@ -25,13 +25,7 @@ var Contract = require('./contract');
 var Token = bookshelf.Model.extend({
   tableName: 'tokens',
   balance: function () {
-    return this.belongsTo(Balance);
-  },
-  parent: function () {
-    return this.belongsTo(Token.model);
-  },
-  children: function () {
-    return this.hasMany(Token.model);
+    return this.hasOne(Balance.model);
   },
   contract: function () {
     return this.belongsTo(Contract.model);
