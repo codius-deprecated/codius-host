@@ -25,6 +25,7 @@ app.use(morgan(config.get('log_format'), {stream: log.winstonStream}))
 var routeGetHealth = require('./routes/get_health');
 var routePostContract = require('./routes/post_contract');
 var routePostToken = require('./routes/post_token');
+var routeGetTokenMetadata = require('./routes/get_token_metadata');
 
 app.set('config', config);
 app.set('knex', db.knex);
@@ -36,6 +37,7 @@ app.set('engine', engine.engine);
 app.get('/health', routeGetHealth);
 app.post('/contract', routePostContract);
 app.post('/token', routePostToken);
+app.get('/token/:token', routeGetTokenMetadata);
 
 var unique = 0, internalServer;
 // Run migrations
