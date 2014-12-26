@@ -41,7 +41,8 @@ app.set('engine', engine.engine);
 app.get('/health', routeGetHealth);
 app.post('/contract', routePostContract);
 app.post('/token', routePostToken);
-app.get('/token/:token', routeGetTokenMetadata);
+// TODO: do something better than 'bind' to pass the manager to the route
+app.get('/token/:token', routeGetTokenMetadata.bind(null, manager));
 
 // TODO: take this out, obviously
 var Token = require('./models/token').model;
