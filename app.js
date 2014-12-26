@@ -16,8 +16,12 @@ var log = require('./lib/log');
 var db = require('./lib/db');
 var engine = require('./lib/engine');
 var tokenLib = require('./lib/token');
-var manager = require('./lib/manager');
+var Manager = require('./lib/manager').Manager;
 
+var manager = new Manager({
+  pollInterval: 100,
+  millisecondsPerComputeUnit: config.get('millisecondsPerComputeUnit') || 100
+});
 var app = express();
 
 app.use(morgan(config.get('log_format'), {stream: log.winstonStream}))
