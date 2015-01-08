@@ -25,7 +25,13 @@ To interact with your Codius host, checkout the [Codius CLI](https://github.com/
 
 ## Certificate
 
-First, you need to generate a self-signed certificate. For example, using OpenSSL:
+First, you need to generate a self-signed certificate. 
+
+``` sh
+npm run keygen
+```
+
+The command `npm run keygen` uses the following OpenSSL to generate RSA keys:
 
 ``` sh
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout server.key -out server.crt
