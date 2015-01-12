@@ -7,7 +7,7 @@ This is a prototype implementation of a Codius host. Codius hosts run contracts 
 ## Installation
 
 ``` sh
-git clone git@github.com:codius/codius-host.git
+git clone https://github.com/codius/codius-host.git
 cd codius-host
 npm install
 node app
