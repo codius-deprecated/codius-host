@@ -28,10 +28,16 @@ var net = require('net');
 var fs = require('fs');
 var path = require('path');
 
-// Load application components - order matters
-var config = require('./lib/config');
 // Log should be loaded before any components that might log during startup
 var log = require('./lib/log');
+
+// Load application components - order matters
+var config = require('./lib/config');
+
+if (!config.get('bitcoin_bip32_extended_public_key')) {
+  throw new Error('Must set bitcoin_bip32_extended_public_key config option. To generate a BIP32 HD Wallet you can use https://bip32jp.github.io/english/');
+}
+
 var db = require('./lib/db');
 var engine = require('./lib/engine');
 var tokenLib = require('./lib/token');
