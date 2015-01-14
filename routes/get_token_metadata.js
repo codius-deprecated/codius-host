@@ -13,7 +13,7 @@ module.exports = function(manager, req, res, next) {
   }
 
   new Token({token: token}).fetch({
-    withRelated: ['balance']
+    withRelated: ['balance', 'contract']
   }).then(function (model) {
     if (!model) {
       res.status(404).json({
@@ -24,6 +24,7 @@ module.exports = function(manager, req, res, next) {
       manager.checkTokenBalance(token).then(function(balance){
         res.status(200).json({
           token: token,
+          hash: model.related('contract').get('hash'),
           compute_units: balance,
           bitcoin_address: Bitcoin.generateDeterministicWallet(model.related('balance').id),
           compute_units_per_bitcoin: config.get('compute_units_per_bitcoin')
