@@ -9,15 +9,25 @@ var net = require('net');
 var fs = require('fs');
 var path = require('path');
 
-// Load application components - order matters
-var config = require('./lib/config');
 // Log should be loaded before any components that might log during startup
 var log = require('./lib/log');
+
+// Load application components - order matters
+var config = require('./lib/config');
+
+if (!config.get('bitcoin_bip32_extended_public_key')) {
+  throw new Error('Must set bitcoin_bip32_extended_public_key config option. To generate a BIP32 HD Wallet you can use https://bip32jp.github.io/english/');
+}
+
 var db = require('./lib/db');
 var engine = require('./lib/engine');
 var tokenLib = require('./lib/token');
-var manager = require('./lib/manager');
+var Manager = require('./lib/manager').Manager;
 
+var manager = new Manager({
+  pollInterval: 100,
+  millisecondsPerComputeUnit: config.get('millisecondsPerComputeUnit') || 100
+});
 var app = express();
 
 app.use(morgan(config.get('log_format'), {stream: log.winstonStream}))
@@ -25,6 +35,7 @@ app.use(morgan(config.get('log_format'), {stream: log.winstonStream}))
 var routeGetHealth = require('./routes/get_health');
 var routePostContract = require('./routes/post_contract');
 var routePostToken = require('./routes/post_token');
+var routeGetTokenMetadata = require('./routes/get_token_metadata');
 
 app.set('config', config);
 app.set('knex', db.knex);
@@ -36,6 +47,34 @@ app.set('engine', engine.engine);
 app.get('/health', routeGetHealth);
 app.post('/contract', routePostContract);
 app.post('/token', routePostToken);
+// TODO: do something better than 'bind' to pass the manager to the route
+app.get('/token/:token', routeGetTokenMetadata.bind(null, manager));
+
+// TODO: take this out, obviously
+var Token = require('./models/token').model;
+app.get('/showmethemoney', function(req, res){
+  if (req.query && typeof req.query.token === 'string' && tokenLib.TOKEN_REGEX.test(req.query.token)) {
+    new Token({token: req.query.token}).fetch({
+      withRelated: ['balance']
+    }).then(function(model){
+      if (!model) {
+        res.status(404).json({
+          message: 'Token not found'
+        });
+        return;
+      }
+
+      var balance = model.related('balance');
+      balance.set({balance: (parseInt(req.query.amount) || 1000) + balance.get('balance')});
+      balance.save().then(function(newBalance){
+        res.status(200).json({
+          token: model.get('token'),
+          balance: newBalance.get('balance')
+        });
+      })
+    })
+  }
+});
 
 var unique = 0, internalServer;
 // Run migrations

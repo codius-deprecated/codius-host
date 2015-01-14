@@ -2,6 +2,7 @@ var tokenLib = require('../lib/token');
 
 var Token = require('../models/token').model;
 var Contract = require('../models/contract').model;
+var Balance = require('../models/balance').model;
 
 /**
  * Request a token.
@@ -29,8 +30,13 @@ module.exports = function (req, res) {
         message: "Unknown contract hash"
       });
     } else {
+      // TODO: clean up this mess of returns
       return getUniqueToken().then(function (token) {
-        return Token.forge({token: token, contract_id: contract.get('id')}).save();
+        return Token.forge({token: token, contract_id: contract.get('id')}).save().then(function(token){
+          return Balance.forge({token_id: token.get('id'), balance: 0}).save().then(function(){
+            return token;
+          });
+        });
       }).then(function (token) {
         // All done!
         res.status(200).json({

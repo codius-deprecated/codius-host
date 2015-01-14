@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "base64url": "0.0.6",
+    "bitcoinjs-lib": "^1.4.3",
     "bluebird": "^2.3.6",
     "bookshelf": "^0.7.7",
     "chalk": "^0.5.1",
