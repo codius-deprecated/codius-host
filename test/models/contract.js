@@ -1,5 +1,5 @@
 var path     = require('path');
-var Contract = require(path.join(__dirname, '../..')).Contract;
+var Contract = require(path.join(__dirname, '/../../models/contract')).model;
 var assert   = require('assert');
 
 describe('Contracts Database Model', function() {
