@@ -1,0 +1,30 @@
+#!/usr/local/bin/node
+
+var program  = require('commander');
+var features =  require(__dirname+'/../lib/features');
+
+function list(val) {
+  return val.split(',');
+}
+
+program
+  .option('-f, --features <features>', 'List of features', list)
+
+program
+  .command('start')
+  .description('start Codius Host')
+  .action(function() {
+
+    if (program.features && program.features.length > 0) {
+      console.log('Features Enabled:');
+      program.features.forEach(function(feature) {
+        console.log('-', feature);
+        features.enable(feature.toUpperCase());
+      });
+    }
+
+    require(__dirname+'/../app');
+  });
+
+program.parse(process.argv);
+

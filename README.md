@@ -10,7 +10,8 @@ This is a prototype implementation of a Codius host. Codius hosts run contracts 
 git clone https://github.com/codius/codius-host.git
 cd codius-host
 npm install
-node app
+npm link
+codius-host start
 ```
 
 ## Now what?
@@ -50,3 +51,25 @@ sudo /etc/init.d/dnsmasq restart
 ```
 
 Afterwards, configure your Codius host to use "localcodius" as its hostname. You'll be able to access local contracts using URLs like https://abcabc-abcabc-abcabc.localcodius:2633.
+
+## Contributing
+
+Development of features should made on the `master` branch behind a Feature Flag. To create a feaure flag require `lib/features.js` and only run your feature's code if the feature is enabed. Feature names are in ALL_CAPS.
+
+````
+var features = require('lib/features')
+
+if (features.isEnabled('MY_COOL_FEATURE')) {
+  // New code belongs here
+}
+````
+
+
+Features are enabled at startup using the command line flag -f or --feature. Multiple features can be specified using commas without spaces.
+
+````
+codius-host start --features my_cool_feature
+
+codius-host start -f feature_one,feature_two
+````
+
