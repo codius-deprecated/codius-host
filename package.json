@@ -1,10 +1,15 @@
 {
   "name": "codius-host",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Codius smart oracle host for Node.js",
-  "main": "app.js",
+  "main": "lib/index.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "bin/codius-host start",
+    "keygen": "openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout server.key -out server.crt",
+    "test": "mocha -R spec test/ test/models/*.js"
+  },
+  "bin": {
+    "codius-host": "bin/codius-host"
   },
   "repository": {
     "type": "git",
@@ -38,18 +43,23 @@
   },
   "dependencies": {
     "base64url": "0.0.6",
+    "bitcoinjs-lib": "^1.4.3",
     "bluebird": "^2.3.6",
     "bookshelf": "^0.7.7",
     "chalk": "^0.5.1",
     "codius-engine": "https://github.com/codius/codius-engine/tarball/master",
+    "commander": "^2.6.0",
     "concat-stream": "^1.4.6",
     "express": "^4.5.1",
+    "flipper": "0.0.3",
     "knex": "^0.6.22",
     "morgan": "^1.2.2",
     "nconf": "^0.6.9",
     "nodemon": "^1.2.1",
     "pg.js": "^3.4.1",
     "random-js": "^1.0.4",
+    "sinon": "^1.12.2",
+    "supertest": "^0.15.0",
     "tar-stream": "^0.4.4",
     "winston": "^0.7.3"
   }
