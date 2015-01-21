@@ -65,7 +65,7 @@ if (features.isEnabled('MY_COOL_FEATURE')) {
 ````
 
 
-Features are enabled at startup using the command line flag -f or --feature. Multiple features can be specified using commas without spaces.
+Features are enabled at startup using the command line flag -f or --features. Multiple features can be specified using commas without spaces.
 
 ````
 codius-host start --features my_cool_feature
