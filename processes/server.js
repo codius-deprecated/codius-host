@@ -17,13 +17,8 @@
 */
 //==============================================================================
 
-var BridgesApplication = require('bridges-application');
-var codius             = require(__dirname+'/lib');
+module.exports = function(codius) {
 
-new BridgesApplication({
-  directory: __dirname,
-  processes: {
-    inject: [codius]
-  }
-}).supervisor.start();
+  new codius.Server().start();
+}
 
