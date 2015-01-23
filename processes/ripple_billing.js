@@ -16,14 +16,12 @@
     OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 //==============================================================================
+module.exports = function(codius) {
 
-var BridgesApplication = require('bridges-application');
-var codius             = require(__dirname+'/lib');
-
-new BridgesApplication({
-  directory: __dirname,
-  processes: {
-    inject: [codius]
+  if (codius.features.isEnabled('RIPPLE_BILLING')) {
+    if (!codius.config.get('RIPPLE_ADDRESS')) {
+      throw new Error('RIPPLE_ADDRESS must be set in environment to enable Ripple billing')
+    }
   }
-}).supervisor.start();
+}
 

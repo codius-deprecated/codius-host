@@ -17,13 +17,14 @@
 */
 //==============================================================================
 
-var BridgesApplication = require('bridges-application');
-var codius             = require(__dirname+'/lib');
+module.exports = function(codius) {
 
-new BridgesApplication({
-  directory: __dirname,
-  processes: {
-    inject: [codius]
+  if (codius.features.isEnabled('BITCOIN_BILLING')) {
+    if (!codius.config.get('bitcoin_bip32_extended_public_key')) {
+      var message =  'Must set bitcoin_bip32_extended_public_key config option.'; 
+          message += 'To generate a BIP32 HD Wallet you can use https://bip32jp.github.io/english/';
+      throw new Error(message);
+    }
   }
-}).supervisor.start();
+}
 

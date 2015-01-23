@@ -17,13 +17,14 @@
 */
 //==============================================================================
 
-var BridgesApplication = require('bridges-application');
-var codius             = require(__dirname+'/lib');
+module.exports = function(codius) {
 
-new BridgesApplication({
-  directory: __dirname,
-  processes: {
-    inject: [codius]
+  if (codius.features.isEnabled('BILLING_GENERIC')) {
+
+    var manager = new codius.Manager({
+      pollInterval: 100,
+      millisecondsPerComputeUnit: codius.config.get('millisecondsPerComputeUnit') || 100
+    });
   }
-}).supervisor.start();
+}
 
