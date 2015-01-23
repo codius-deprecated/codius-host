@@ -19,9 +19,9 @@
 
 var bookshelf = require('../lib/db').bookshelf;
 
-var Token   = require('./token').model;
-var Credit  = require('./credit').model;
-var Debit   = require('./debit').model;
+var Token   = require('./token');
+var Credit  = require('./credit');
+var Debit   = require('./debit');
 var Promise = require('bluebird');
 
 var Balance = bookshelf.Model.extend({
@@ -30,19 +30,19 @@ var Balance = bookshelf.Model.extend({
     balance: 0
   },
   tokens: function () {
-    return this.belongsTo(Token);
+    return this.belongsTo(Token.model);
   },
   debits: function() {
-    return this.hasMany(Debit);
+    return this.hasMany(Debit.model);
   },
   credits: function() {
-    return this.hasMany(Credit);
+    return this.hasMany(Credit.model);
   },
   credit: function(amount) {
-    return Credit.creditBalance(this, amount)
+    return Credit.model.creditBalance(this, amount)
   },
   debit: function(amount) {
-    return Debit.debitBalance(this, amount);
+    return Debit.model.debitBalance(this, amount);
   },
   refresh: function() {
     return new Balance({ id: this.get('id') }).fetch()
