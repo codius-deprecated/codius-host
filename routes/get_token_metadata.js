@@ -1,8 +1,10 @@
-var Token = require('../models/token').model;
-var Bitcoin = require('../lib/bitcoin');
-var config = require('../lib/config');
+var Token          = require('../models/token').model;
+var Bitcoin        = require('../lib/bitcoin');
+var config         = require('../lib/config');
+var BillingService = require('../lib/billing_service');
+var features       = require('../lib/features');
 
-module.exports = function(manager, req, res, next) {
+module.exports = function(req, res, next) {
 
   var token = req.params.token;
   if (!token) {
@@ -21,15 +23,18 @@ module.exports = function(manager, req, res, next) {
       });
       return;
     } else {
-      manager.checkTokenBalance(token).then(function(balance){
-        res.status(200).json({
+      new BillingService().getBalance(model).then(function(balance) {
+        var metadata = {
           token: token,
           hash: model.related('contract').get('hash'),
-          compute_units: balance,
-          bitcoin_address: Bitcoin.generateDeterministicWallet(model.related('balance').id),
-          compute_units_per_bitcoin: config.get('compute_units_per_bitcoin')
-        });
-      });
+          compute_units: balance.get('balance')
+        }
+        if (features.isEnabled('BILLING_BITCOIND')) {
+          metadata.bitcoin_address = Bitcoin.generateDeterministicWallet(model.related('balance').id);
+          metadata.compute_units_per_bitcoin = config.get('compute_units_per_bitcoin');
+        }
+        res.status(200).json(metadata);
+      })
     }
   });
 
