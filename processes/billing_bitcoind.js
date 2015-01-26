@@ -19,12 +19,26 @@
 
 module.exports = function(codius) {
 
-  if (codius.features.isEnabled('BITCOIN_BILLING')) {
-    if (!codius.config.get('bitcoin_bip32_extended_public_key')) {
-      var message =  'Must set bitcoin_bip32_extended_public_key config option.'; 
-          message += 'To generate a BIP32 HD Wallet you can use https://bip32jp.github.io/english/';
-      throw new Error(message);
+  if (codius.features.isEnabled('BILLING_BITCOIND')) {
+
+    // during development of this feature use a path to the module instead of npm
+    var library = process.env['CODIUS_BILLING_BITCOIND_PATH'] || 'codius-billing-bitcoind'
+
+    var CodiusBillingBitcoind = require(library);
+
+    var bitcoind = {
+      host: process.env['BITCOIND_HOST'],
+      port: process.env['BITCOIND_PORT'],
+      user: process.env['BITCOIND_USER'],
+      pass: process.env['BITCOIND_PASS'],
+      confirmations: process.env['BITCOIND_CONFIRMATIONS']
     }
+
+    var billing = new CodiusBillingBitcoind(codius, bitcoind)
+    
+    codius.on('contract:created', billing.registerContract)
+
+    billing.processPayments()
   }
 }
 
