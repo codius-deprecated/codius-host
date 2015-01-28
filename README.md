@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/codius/codius-host.svg?branch=master)](https://travis-ci.org/codius/codius-host)
 # Codius host
 
 **NOT READY FOR PRODUCTION USE**
