@@ -1,6 +1,8 @@
 language: node_js
 node_js:
   - "0.10"
+before_script:
+  - openssl req -x509 -nodes -days 365 -subj '/CN=codius.org' -newkey rsa:2048 -keyout server.key -out server.crt
 notifications:
   slack:
     secure: dWShGhYEiV7l9wyNl+vuPi16f9PmKYqs/hfCmmQBFf+080ViBxyXXCiqTyyvQJ8AkQ7sEL7P2Ke5q/bXzXftdpc2L6q3iJYvMI9nudoAH1Zc19m+LsIMu41pNpe7igJpJgWasodvzoHnj452jikZCd0ioppo9mEfp0e8+3O5eSE=
