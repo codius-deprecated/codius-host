@@ -2,6 +2,8 @@ language: node_js
 node_js:
   - "0.10"
 before_script:
+  - npm install -g knex
+  - knex migrate:latest
   - openssl req -x509 -nodes -days 365 -subj '/CN=codius.org' -newkey rsa:2048 -keyout server.key -out server.crt
 notifications:
   slack:
