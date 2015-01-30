@@ -10,6 +10,12 @@ describe('Balance Model', function() {
     });
   });
 
+  after(function(done) {
+    balance.destroy().then(function() {
+      done();
+    });
+  });
+
   it('should have an amount of zero', function() {
     assert.strictEqual(balance.get('balance'), 0);
   });

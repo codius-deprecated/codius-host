@@ -4,12 +4,18 @@ var BillingService  = require(path.join(__dirname, '/../lib/billing_service'));
 var assert          = require('assert');
 
 describe('Billing Service', function() {
-  var token;
-  
+  var token, billing;
+
   before(function(done) {
     billing = new BillingService();
     new Token().save().then(function(token_) {
       token = token_;
+      done();
+    });
+  });
+
+  after(function(done) {
+    token.destroy().then(function() {
       done();
     });
   });

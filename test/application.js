@@ -6,22 +6,11 @@ var supertest  = require('supertest');
 var Contract   = require(__dirname+'/../models/contract').model;
 
 describe('Codius Host Express Application', function() {
-  var application, http, contractHash;
+  var application, http;
 
   before(function() {
     application = new CodiusHost.Application();
     http        = supertest(application);
-
-    contractHash = '427c7a0bfa92621f93fac7ed35e42a6d4fc4fef522b89ade12776367399014ef';
-    new Contract({hash: contractHash}).fetch().then(function (contract) {
-      if (contract) {
-        return contract;
-      } else {
-        return Contract.forge({
-          hash: contractHash
-        }).save();
-      }
-    })
   })
 
   it('should initialize an express application', function() {
@@ -39,14 +28,19 @@ describe('Codius Host Express Application', function() {
   });
 
   it('should expose a token generation route', function(done) {
-    http
-      .post('/token?contract='+contractHash)
-      .expect(200)
-      .end(function(error, response) {
-        assert.strictEqual(response.statusCode, 200);
-        token = response.body.token;
-        done();
-      });
+    var contractHash = '427c7a0bfa92621f93fac7ed35e42a6d4fc4fef522b89ade12776367399014ef';
+    new Contract({hash: contractHash}).save().then(function (contract) {
+      http
+        .post('/token?contract='+contractHash)
+        .expect(200)
+        .end(function(error, response) {
+          assert.strictEqual(response.statusCode, 200);
+          token = response.body.token;
+          contract.destroy().then(function() {
+            done();
+          });
+        });
+    })
   });
 
   it('should expose a contract metadata route', function(done) {
