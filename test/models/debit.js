@@ -6,11 +6,17 @@ var Balance  = require(path.join(__dirname, '/../../models/balance')).model;
 var assert   = require('assert');
 
 describe('Debit Model', function() {
-  var token, balance;
+  var token;
 
   before(function(done) {
     new Token().save().then(function(_token) {
       token = _token;
+      done();
+    });
+  });
+
+  after(function(done) {
+    token.destroy().then(function() {
       done();
     });
   });
