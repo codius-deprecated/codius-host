@@ -2,11 +2,9 @@ var Promise = require('bluebird')
 
 module.exports = function(codius) {
 
-  var compute = new codius.ComputeService();
-
   return {
     create: function(req, res, next) {
-      return compute.startInstance(req.body.token,
+      return codius.compute.startInstance(req.body.token,
                                    req.body.container_uri,
                                    req.body.type, 
                                    req.body.vars,
@@ -20,7 +18,7 @@ module.exports = function(codius) {
     },
 
     stop: function(req, res, next) {
-      return compute.stopInstance(req.params.token).then(function(state) {
+      return codius.compute.stopInstance(req.params.token).then(function(state) {
         res.send({
           success: true,
           instance: {
@@ -32,7 +30,7 @@ module.exports = function(codius) {
     },
 
     index: function(req, res, next) {
-      return compute.getInstances().then(function(instances) {
+      return codius.compute.getInstances().then(function(instances) {
         res.status(200).send({
           success: true,
           instances: instances
@@ -42,7 +40,7 @@ module.exports = function(codius) {
     },
 
     show: function(req, res, next) {
-      return compute.getInstance(req.params.token).then(function(instance) {
+      return codius.compute.getInstance(req.params.token).then(function(instance) {
         res.status(200).send({
           success: true,
           instances: instance
