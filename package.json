@@ -6,7 +6,7 @@
   "scripts": {
     "start": "bin/codius-host start",
     "keygen": "openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout server.key -out server.crt",
-    "test": "mocha -R spec test/ test/models/*.js"
+    "test": "mocha -R spec test/ test/models/*.js test/http/*.js"
   },
   "bin": {
     "codius-host": "bin/codius-host"
@@ -64,6 +64,7 @@
     "sinon": "^1.12.2",
     "supertest": "^0.15.0",
     "tar-stream": "^0.4.4",
+    "uuid": "^2.0.1",
     "winston": "^0.7.3"
   }
 }
