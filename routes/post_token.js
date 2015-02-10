@@ -23,6 +23,10 @@ var Token = require('../models/token').model;
 var Contract = require('../models/contract').model;
 var Balance = require('../models/balance').model;
 
+var engine = require('../lib/engine');
+var features = require('../lib/features');
+var request = require('request');
+
 /**
  * Request a token.
  *
@@ -48,11 +52,49 @@ module.exports = function (req, res) {
       res.status(400).json({
         message: "Unknown contract hash"
       });
-    } else {
+    } else {     
       // TODO: clean up this mess of returns
       return getUniqueToken().then(function (token) {
         return Token.forge({token: token, contract_id: contract.get('id')}).save().then(function(token){
-          return Balance.forge({token_id: token.get('id'), balance: 0}).save().then(function(){
+          return Balance.forge({token_id: token.get('id'), balance: 0}).save().then(function(balance){
+            // Start running the instance
+            if (features.isEnabled('COMPUTE_SERVICE')) {
+              request.post('http://127.0.0.1:'+((parseInt(process.env.PORT) || 5000) + 30)+'/instances',
+              {
+                form: { token: token.get('token') }
+              }, function (error, res, body) {
+                if (error) {
+                  console.log('Error killing instance (' + token.get('token') + '): ' + error);
+                }
+              });
+            } else {
+              var contractHash = contract.get('hash');
+
+              // Start the contract if there is no currently running instance yet
+              var runner = engine.engine.runContract(contractHash);
+
+              // TODO: modify the engine and sandbox to make this work
+              // var contractIdent = formatter.hash(contractHash) + chalk.dim(':' + runId);
+              // runner._sandbox.pipeStdout({
+              //   write: function (output) {
+              //     // TODO Redirect to a stream that clients can subscribe to
+              //     winston.debug(contractIdent, chalk.dim('...'),output.replace(/\n$/, ''));
+              //   }
+              // });
+              self._runningInstances[token] = {
+                runner: runner,
+                lastCheckedBalance: 0,
+                lastChargedTime: Date.now()
+              };
+
+              // If the contract exits by itself, update its balance
+              // and then remove it from the runningInstances array
+              runner.on('exit', function (code, signal) {
+                self.chargeToken(token).then(function(){
+                  delete self._runningInstances[token];
+                });
+              });
+            }
             return token;
           });
         });

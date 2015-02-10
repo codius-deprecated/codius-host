@@ -61,6 +61,7 @@
     "nodemon": "^1.2.1",
     "pg.js": "^3.4.1",
     "random-js": "^1.0.4",
+    "request": "^2.39.0",
     "sinon": "^1.12.2",
     "supertest": "^0.15.0",
     "tar-stream": "^0.4.4",
