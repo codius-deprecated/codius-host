@@ -19,6 +19,6 @@
 
 module.exports = function(codius) {
 
-  new codius.Server().start();
+  new codius.Server().start(codius.compute);
 }
 
