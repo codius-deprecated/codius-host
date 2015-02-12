@@ -36,7 +36,7 @@ module.exports = function(codius) {
 
     var billing = new CodiusBillingBitcoind(codius, bitcoind)
     
-    codius.on('contract:created', billing.registerContract)
+    codius.events.on('contract:created', billing.registerContract)
 
     billing.processPayments()
   }
