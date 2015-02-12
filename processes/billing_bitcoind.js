@@ -31,12 +31,14 @@ module.exports = function(codius) {
       port: process.env['BITCOIND_PORT'],
       user: process.env['BITCOIND_USER'],
       pass: process.env['BITCOIND_PASS'],
-      confirmations: process.env['BITCOIND_CONFIRMATIONS']
+      confirmations: process.env['BITCOIND_CONFIRMATIONS'] || 0
     }
 
     var billing = new CodiusBillingBitcoind(codius, bitcoind)
     
-    codius.events.on('contract:created', billing.registerContract)
+    codius.events.on('contract:created', function(token) {
+      billing.registerContract(token)
+    })
 
     billing.processPayments()
   }
