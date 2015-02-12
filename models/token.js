@@ -20,11 +20,13 @@
 var bookshelf = require('../lib/db').bookshelf;
 var Balance   = require(__dirname+'/balance');
 var Contract  = require(__dirname+'/contract');
+var events    = require(__dirname+'/../lib/events');
 var Promise   = require('bluebird');
 
 var Token = bookshelf.Model.extend({
   initialize: function() {
     this.on('created', this.attachBalance);
+    this.on('created', this.emitCreated);
   },
   tableName: 'tokens',
   balance: function () {
@@ -32,6 +34,9 @@ var Token = bookshelf.Model.extend({
   },
   contract: function () {
     return this.belongsTo(Contract.model);
+  },
+  emitCreated: function(token) {
+    events.emit('contract:created', token);
   },
   attachBalance: function() {
     var this_ = this;
