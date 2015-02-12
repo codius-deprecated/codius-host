@@ -17,18 +17,21 @@
 */
 //==============================================================================
 
-var path = require('path');
+var bookshelf = require('../lib/db').bookshelf;
+var Token     = require(__dirname+'/token')
+var Ledger    = require(__dirname+'/ledger')
 
-module.exports.Server         = require(path.join(__dirname, 'server'));
-module.exports.Application    = require(path.join(__dirname, 'application'));
-module.exports.BillingService = require(path.join(__dirname, 'billing_service'));
-module.exports.compute        = require(path.join(__dirname, 'compute_service'));
-module.exports.Manager        = require(path.join(__dirname, 'manager')).Manager;
-module.exports.Token          = require(path.join(__dirname, '/../models/token')).model;
-module.exports.Ledger         = require(path.join(__dirname, '/../models/ledger')).model;
-module.exports.Address        = require(path.join(__dirname, '/../models/address')).model;
-module.exports.features       = require(path.join(__dirname, 'features'));
-module.exports.config         = require(path.join(__dirname, 'config'));
-module.exports.logger         = require(path.join(__dirname, 'log')).winston;
-module.exports.events         = require(path.join(__dirname, 'events'));
+var Address = bookshelf.Model.extend({
+  tableName: 'addresses',
+  
+  ledger: function() {
+    return this.belongsTo(Ledger.model)
+  },
+
+  token: function() {
+    return this.belongsTo(Token.model)
+  }
+});
+
+exports.model = Address;
 

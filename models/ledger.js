@@ -17,18 +17,34 @@
 */
 //==============================================================================
 
-var path = require('path');
+var bookshelf = require('../lib/db').bookshelf;
+var Address   = require(__dirname+'/address')
 
-module.exports.Server         = require(path.join(__dirname, 'server'));
-module.exports.Application    = require(path.join(__dirname, 'application'));
-module.exports.BillingService = require(path.join(__dirname, 'billing_service'));
-module.exports.compute        = require(path.join(__dirname, 'compute_service'));
-module.exports.Manager        = require(path.join(__dirname, 'manager')).Manager;
-module.exports.Token          = require(path.join(__dirname, '/../models/token')).model;
-module.exports.Ledger         = require(path.join(__dirname, '/../models/ledger')).model;
-module.exports.Address        = require(path.join(__dirname, '/../models/address')).model;
-module.exports.features       = require(path.join(__dirname, 'features'));
-module.exports.config         = require(path.join(__dirname, 'config'));
-module.exports.logger         = require(path.join(__dirname, 'log')).winston;
-module.exports.events         = require(path.join(__dirname, 'events'));
+var Ledger = bookshelf.Model.extend({
+  tableName: 'ledgers',
+  
+  registerAddress: function(token, address) {
+    return new Address.model({
+      token_id: token.get('id'),
+      ledger_id: this.get('id'),
+      address: address
+    })
+    .save()
+  },
+  
+  addresses: function() {
+    return this.hasMany(Address.model)
+  }
+});
+
+Ledger.findOrCreate = function(options) {
+  var ledger = new Ledger(options)
+
+  return ledger.fetch().then(function(ledger) {
+    if (ledger) { return ledger }
+    return new Ledger(options).save()
+  })
+}
+
+exports.model = Ledger;
 

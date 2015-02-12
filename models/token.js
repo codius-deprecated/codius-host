@@ -32,6 +32,9 @@ var Token = bookshelf.Model.extend({
   balance: function () {
     return this.hasOne(Balance.model);
   },
+  addresses: function() {
+    return this.hasMany(Token.model);
+  },
   contract: function () {
     return this.belongsTo(Contract.model);
   },
