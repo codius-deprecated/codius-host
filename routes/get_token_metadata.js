@@ -3,6 +3,7 @@ var Bitcoin        = require('../lib/bitcoin');
 var config         = require('../lib/config');
 var BillingService = require('../lib/billing_service');
 var features       = require('../lib/features');
+var _              = require('lodash')
 
 module.exports = function(req, res, next) {
 
@@ -30,12 +31,16 @@ module.exports = function(req, res, next) {
           compute_units: balance.get('balance')
         }
         if (features.isEnabled('BILLING_BITCOIND')) {
-          metadata.bitcoin_address = Bitcoin.generateDeterministicWallet(model.related('balance').id);
-          metadata.compute_units_per_bitcoin = config.get('compute_units_per_bitcoin');
+          model.related('addresses').fetch({ withRelated: ['ledger'] }).then(function(addresses) {
+            metadata.payment_addresses = _.map(addresses.models, function(address) {
+              return address.related('ledger').get('name')+':'+address.get('address')
+            })
+            res.status(200).json(metadata);
+          })
+        } else {
+          res.status(200).json(metadata);
         }
-        res.status(200).json(metadata);
       })
     }
   });
-
 };

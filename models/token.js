@@ -20,6 +20,7 @@
 var bookshelf = require('../lib/db').bookshelf;
 var Balance   = require(__dirname+'/balance');
 var Contract  = require(__dirname+'/contract');
+var Address   = require(__dirname+'/address');
 var events    = require(__dirname+'/../lib/events');
 var Promise   = require('bluebird');
 
@@ -33,7 +34,7 @@ var Token = bookshelf.Model.extend({
     return this.hasOne(Balance.model);
   },
   addresses: function() {
-    return this.hasMany(Token.model);
+    return this.hasMany(Address.model);
   },
   contract: function () {
     return this.belongsTo(Contract.model);
