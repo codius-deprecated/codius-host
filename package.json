@@ -49,7 +49,7 @@
     "bridges-application": "^0.2.1",
     "bridges-express": "^0.3.1",
     "chalk": "^0.5.1",
-    "codius-billing-bitcoind": "^0.1.0",
+    "codius-billing-bitcoind": "^0.2.0",
     "codius-engine": "https://github.com/codius/codius-engine/tarball/master",
     "commander": "^2.6.0",
     "concat-stream": "^1.4.6",
