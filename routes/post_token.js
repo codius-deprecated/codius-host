@@ -23,6 +23,9 @@ var Token = require('../models/token').model;
 var Contract = require('../models/contract').model;
 var Balance = require('../models/balance').model;
 
+var engine = require('../lib/engine');
+var request = require('request');
+
 /**
  * Request a token.
  *
@@ -48,11 +51,21 @@ module.exports = function (req, res) {
       res.status(400).json({
         message: "Unknown contract hash"
       });
-    } else {
+    } else {     
       // TODO: clean up this mess of returns
       return getUniqueToken().then(function (token) {
         return Token.forge({token: token, contract_id: contract.get('id')}).save().then(function(token){
-          return Balance.forge({token_id: token.get('id'), balance: 0}).save().then(function(){
+          return Balance.forge({token_id: token.get('id'), balance: 0}).save().then(function(balance){
+            // Start running the instance
+            request.post('http://127.0.0.1:'+((parseInt(process.env.PORT) || 5000) + 30)+'/instances',
+            {
+              form: { token: token.get('token') }
+            }, function (error, res, body) {
+              if (error) {
+                console.log('Error killing instance (' + token.get('token') + '): ' + error);
+              }
+            });
+
             return token;
           });
         });
