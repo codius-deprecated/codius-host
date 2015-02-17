@@ -1,10 +1,14 @@
+var bluebird   = require('bluebird');
+
+bluebird.longStackTraces();
+
 var CodiusHost = require(__dirname+'/../');
 var express    = require('express');
 var sinon      = require('sinon');
 var assert     = require('assert');
 var supertest  = require('supertest');
 var Contract   = require(__dirname+'/../models/contract').model;
-var db = require(__dirname+'/../lib/db');
+var db         = require(__dirname+'/../lib/db');
 
 describe('Codius Host Express Application', function() {
   var application, http;
@@ -12,12 +16,21 @@ describe('Codius Host Express Application', function() {
   before(function(done) {
     application = new CodiusHost.Application();
     http        = supertest(application);
-    db.knex.migrate.rollback(db.config);
-    done();
+    db.knex.migrate.rollback(db.config)
+      .then(function() {
+        done();
+      });
   })
 
   beforeEach(function(done) {
     return db.knex.migrate.latest(db.config)
+      .then(function() {
+        done();
+      });
+  });
+
+  afterEach(function(done) {
+    return db.knex.migrate.rollback(db.config)
       .then(function() {
         done();
       });
