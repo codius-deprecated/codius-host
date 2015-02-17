@@ -4,14 +4,24 @@ var sinon      = require('sinon');
 var assert     = require('assert');
 var supertest  = require('supertest');
 var Contract   = require(__dirname+'/../models/contract').model;
+var db = require(__dirname+'/../lib/db');
 
 describe('Codius Host Express Application', function() {
   var application, http;
 
-  before(function() {
+  before(function(done) {
     application = new CodiusHost.Application();
     http        = supertest(application);
+    db.knex.migrate.rollback(db.config);
+    done();
   })
+
+  beforeEach(function(done) {
+    return db.knex.migrate.latest(db.config)
+      .then(function() {
+        done();
+      });
+  });
 
   it('should initialize an express application', function() {
     assert.strictEqual(typeof application.listen, 'function');
