@@ -23,7 +23,7 @@ module.exports = function(codius) {
 
     var amortizer = new codius.Amortizer({
       pollInterval: 100,
-      millisecondsPerComputeUnit: codius.config.get('millisecondsPerComputeUnit') || 100
+      millisecondsPerComputeUnit: codius.config.get('milliseconds_per_compute_unit')
     });
   }
 }

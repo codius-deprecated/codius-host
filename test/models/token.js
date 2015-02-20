@@ -1,7 +1,6 @@
 var path    = require('path');
 var assert  = require('assert');
 var Token   = require(path.join(__dirname+'/../../models/token')).model;
-var Balance = require(path.join(__dirname+'/../../models/balance')).model;
 
 describe('Token Model', function() {
   var token;
