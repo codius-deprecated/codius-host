@@ -1,7 +1,6 @@
 var path     = require('path');
 var Credit   = require(path.join(__dirname, '/../../models/credit')).model;
 var Token    = require(path.join(__dirname, '/../../models/token')).model;
-var Balance  = require(path.join(__dirname, '/../../models/balance')).model;
 var assert   = require('assert');
 
 describe('Credit Model', function() {

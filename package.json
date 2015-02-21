@@ -66,6 +66,7 @@
     "sinon": "^1.12.2",
     "supertest": "^0.15.0",
     "tar-stream": "^0.4.4",
+    "underscore": "^1.7.0",
     "uuid": "^2.0.1",
     "winston": "^0.7.3"
   }
