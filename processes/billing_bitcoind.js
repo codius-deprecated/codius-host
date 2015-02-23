@@ -31,7 +31,7 @@ module.exports = function(codius) {
       port: process.env['BITCOIND_PORT'],
       user: process.env['BITCOIND_USER'],
       pass: process.env['BITCOIND_PASS'],
-      confirmations: process.env['BITCOIND_CONFIRMATIONS'] || 0
+      confirmations: process.env['BITCOIND_CONFIRMATIONS'] || 1
     }
 
     var billing = new CodiusBillingBitcoind(codius, bitcoind)

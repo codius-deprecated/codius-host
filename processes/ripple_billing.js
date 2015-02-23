@@ -19,7 +19,7 @@
 module.exports = function(codius) {
 
   if (codius.features.isEnabled('RIPPLE_BILLING')) {
-    codius.logger.info("RIPPLE_BILLING enabled")
+    codius.logger.info("Ripple Billing Feature Enabled")
 
     const RippleAccountMonitor = require('ripple-account-monitor')
     const http                 = require('superagent')
@@ -27,6 +27,8 @@ module.exports = function(codius) {
     const RIPPLE_REST_URL      = 'https://api.ripple.com/'
     const ADDRESS              = codius.config.get('RIPPLE_ADDRESS')
     const billing              = new codius.BillingService()
+    const CPU_PER_DROP         = codius.config.get('compute_units_per_drop')
+    const CPU_PER_BITCOIN      = codius.config.get('compute_units_per_bitcoin')
 
     if (!ADDRESS) {
       throw new Error('RIPPLE_ADDRESS must be set in environment to enable Ripple billing')
@@ -41,58 +43,66 @@ module.exports = function(codius) {
           })
       })
 
-        fetchLastHash(ledger, ADDRESS).then(function(hash) {
+      fetchLastHash(ledger, ADDRESS).then(function(hash) {
 
-          ledger.set('last_hash', hash).save().then(function() {
-            var monitor = new RippleAccountMonitor({
-              rippleRestUrl: RIPPLE_REST_URL,
-              account: ADDRESS,
-              lastHash: hash,
-              timeout: 3000,
-              onTransaction: function(transaction, next) {
-                ledger.set('last_hash', transaction.hash).save().then(next)
-              },
-              onPayment: function(payment, next) {
-                if (payment.DestinationTag) {
-                  var CPU
-                  if (!payment.Amount.currency) { // XRP
-                    CPU = payment.Amount / 1000000 * 7500
-                  } else if (payment.Amount.currency === 'BTC') {
-                    CPU = payment.Amount.value * 100000000
-                  }
-                  new codius.Token({ id: payment.DestinationTag }).fetch().then(function(token) {
-                    billing.credit(token, CPU).then(function() {
-                      codius.logger.info('token:credited', token.get('token'), CPU)
-                      return ledger.set('last_hash', payment.hash).save().then(next)
-                    })
-                  })
-                } else {
-                  return ledger.set('last_hash', payment.hash).save().then(next)
-                }
-              }
-            })
-
-            monitor.start()
-            codius.logger.info('Staring Ripple Monitor')
-          })
-        })
-      })
-
-      function fetchLastHash(ledger, account) {
-        return new Promise(function(resolve, reject) {
-          if (ledger.get('last_hash')) {
-            resolve(ledger.get('last_hash'))
-          } else {
-            http
-              .get(RIPPLE_REST_URL+'v1/accounts/'+account+'/payments')
-              .end(function(error, response) {
-                if (error) { return reject(error) }
-                if (!response.body.success) { return reject(new Error(response.body)) }
-                resolve(response.body.payments[0].hash)
+        ledger.set('last_hash', hash).save().then(function() {
+          var monitor = new RippleAccountMonitor({
+            rippleRestUrl: RIPPLE_REST_URL,
+            account: ADDRESS,
+            lastHash: hash,
+            timeout: 3000,
+            onTransaction: function(transaction, next) {
+              ledger.set('last_hash', transaction.hash).save().then(next)
+            },
+            onPayment: function(payment, next) {
+              handlePayment(payment).then(function() {
+                ledger.set('last_hash', payment.hash).save().then(next)
               })
-          }
+            }
+          })
+
+          monitor.start()
+          codius.logger.info('Starting Ripple Monitor')
         })
-      }
+      }) 
+    })
+
+    function handlePayment(payment, next) {
+      return new Promise(function(resolve, reject) {
+        if (payment.DestinationTag) {
+          var CPU
+          if (!payment.Amount.currency) { // XRP
+            CPU = payment.Amount * CPU_PER_DROP
+          } else if (payment.Amount.currency === 'BTC') {
+            CPU = payment.Amount.value * CPU_PER_BITCOIN
+          }
+          new codius.Token({ id: payment.DestinationTag }).fetch().then(function(token) {
+            billing.credit(token, CPU).then(function() {
+              codius.logger.info('token:credited', token.get('token'), CPU)
+              resolve()
+            })
+          })
+        } else {
+          resolve()
+        }
+      })
+    }
+
+    function fetchLastHash(ledger, account) {
+      return new Promise(function(resolve, reject) {
+        if (ledger.get('last_hash')) {
+          resolve(ledger.get('last_hash'))
+        } else {
+          http
+            .get(RIPPLE_REST_URL+'v1/accounts/'+account+'/payments')
+            .end(function(error, response) {
+              if (error) { return reject(error) }
+              if (!response.body.success) { return reject(new Error(response.body)) }
+              resolve(response.body.payments[0].hash)
+            })
+        }
+      })
+    }
   }
 }
 
