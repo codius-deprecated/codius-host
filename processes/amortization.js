@@ -21,9 +21,9 @@ module.exports = function(codius) {
 
   if (codius.features.isEnabled('BILLING_GENERIC')) {
 
-    var manager = new codius.Manager({
+    var amortizer = new codius.Amortizer({
       pollInterval: 100,
-      millisecondsPerComputeUnit: codius.config.get('millisecondsPerComputeUnit') || 100
+      millisecondsPerComputeUnit: codius.config.get('milliseconds_per_compute_unit')
     });
   }
 }
