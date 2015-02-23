@@ -44,7 +44,7 @@
   "dependencies": {
     "base64url": "0.0.6",
     "bitcoinjs-lib": "^1.4.3",
-    "bluebird": "^2.3.6",
+    "bluebird": "^2.9.12",
     "bookshelf": "^0.7.7",
     "bridges-application": "^0.2.1",
     "bridges-express": "^0.3.1",
@@ -63,7 +63,9 @@
     "pg.js": "^3.4.1",
     "random-js": "^1.0.4",
     "request": "^2.39.0",
+    "ripple-account-monitor": "^2.2.0",
     "sinon": "^1.12.2",
+    "superagent": "^0.21.0",
     "supertest": "^0.15.0",
     "tar-stream": "^0.4.4",
     "uuid": "^2.0.1",

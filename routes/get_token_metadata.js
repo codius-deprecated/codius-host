@@ -30,16 +30,14 @@ module.exports = function(req, res, next) {
           hash: model.related('contract').get('hash'),
           compute_units: balance.get('balance')
         }
-        if (features.isEnabled('BILLING_BITCOIND')) {
-          model.related('addresses').fetch({ withRelated: ['ledger'] }).then(function(addresses) {
+        model.related('addresses').fetch({ withRelated: ['ledger'] }).then(function(addresses) {
+          if (addresses.models.length > 0) {
             metadata.payment_addresses = _.map(addresses.models, function(address) {
               return address.related('ledger').get('name')+':'+address.get('address')
             })
-            res.status(200).json(metadata);
-          })
-        } else {
+          }
           res.status(200).json(metadata);
-        }
+        })
       })
     }
   });
