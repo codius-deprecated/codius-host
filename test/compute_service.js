@@ -1,6 +1,6 @@
-var bluebird  = require('bluebird');
+var Promise = require('bluebird').Promise;
 
-bluebird.Promise.longStackTraces();
+Promise.longStackTraces();
 
 var assert    = require('assert')
 var _         = require('lodash')
@@ -23,30 +23,34 @@ describe('Compute Service', function() {
     var fileManager = engine.fileManager;
     var compiler = engine.compiler;
     var currentDir = path.join(__dirname, '/test_contract');
+    var p = [];
 
     compiler.on('file', function (event) {
       if (event.name.indexOf(currentDir) !== 0) {
         throw new Error('File path does not have current directory prefix: ' + event.name);
       }
-      fileManager.storeFileWithHash(event.hash, event.data);
+      p.push(fileManager.storeFileWithHash(event.hash, event.data));
     });
 
     contractHash = compiler.compileModule(currentDir);
-    new Contract({hash: contractHash}).fetch().then(function (_contract) {
-      if (_contract) {
-        return _contract;
-      } else {
-        return Contract.forge({
-          hash: contractHash
-        }).save();
-      }
-    }).then(function (_contract) {
-      contract = _contract;
-      new Token({ token: uuid.v4(), contract_id: contract.get('id')}).save().then(function(token_) {
-        token = token_;
-        done();
-      });
-    })
+
+    p.push(new Contract({hash: contractHash}).fetch().then(function (_contract) {
+        if (_contract) {
+          return _contract;
+        } else {
+          return Contract.forge({
+            hash: contractHash
+          }).save();
+        }
+      }).then(function (_contract) {
+        contract = _contract;
+        return new Token({ token: uuid.v4(), contract_id: contract.get('id')}).save().then(function(token_) {
+          token = token_;
+        });
+      })
+    );
+
+    Promise.all(p).then(function() {done()}).catch(function (e) {done(e)});
   });
 
   after(function(done) {
