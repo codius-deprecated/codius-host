@@ -6,7 +6,7 @@ var supertest  = require('supertest');
 var Contract   = require(__dirname+'/../models/contract').model;
 
 describe('Codius Host Express Application', function() {
-  var application, http;
+  var application, http, token;
 
   before(function() {
     application = new CodiusHost.Application();

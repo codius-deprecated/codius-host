@@ -20,11 +20,7 @@
 module.exports = function(codius) {
 
   if (codius.features.isEnabled('BILLING_GENERIC')) {
-
-    var amortizer = new codius.Amortizer({
-      pollInterval: 100,
-      millisecondsPerComputeUnit: codius.config.get('milliseconds_per_compute_unit')
-    });
+    codius.amortizer.startPollingRunningInstances(100);
   }
 }
 
