@@ -17,19 +17,20 @@
 */
 //==============================================================================
 
-var bookshelf = require('../lib/db').bookshelf;
-
-var Token   = require('./token');
-var Credit  = require('./credit');
-var Debit   = require('./debit');
-var Promise = require('bluebird');
+var path      = require('path');
+var bookshelf = require(path.join(__dirname, '/../lib/db')).bookshelf;
+var Credit    = require(path.join(__dirname, 'credit'));
+var Debit     = require(path.join(__dirname, 'debit'));
+var events    = require(path.join(__dirname+'/../lib/events'));
+var Token     = require(path.join(__dirname, 'token'));
+var Promise   = require('bluebird');
 
 var Balance = bookshelf.Model.extend({
   tableName: 'balances',
   defaults: {
     balance: 0
   },
-  tokens: function () {
+  token: function () {
     return this.belongsTo(Token.model);
   },
   debits: function() {
@@ -39,10 +40,22 @@ var Balance = bookshelf.Model.extend({
     return this.hasMany(Credit.model);
   },
   credit: function(amount) {
-    return Credit.model.creditBalance(this, amount)
+    var self = this;
+    return Credit.model.creditBalance(self, amount).then(function(credit) {
+      return self.refresh().then(function(balance) {
+        events.emit('balance:credited', balance);
+        return credit;
+      })
+    });
   },
   debit: function(amount) {
-    return Debit.model.debitBalance(this, amount);
+    var self = this;
+    return Debit.model.debitBalance(self, amount).then(function(debit) {
+      return self.refresh().then(function(balance) {
+        events.emit('balance:debited', balance);
+        return debit;
+      })
+    });
   },
   refresh: function() {
     return new Balance({ id: this.get('id') }).fetch()
