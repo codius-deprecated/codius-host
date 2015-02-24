@@ -1,0 +1,30 @@
+machine:
+  services:
+    - docker
+dependencies:
+  pre:
+    - sudo apt-get update
+    - sudo apt-get install multiarch-support
+    - sudo apt-get update
+    - sudo apt-get install libseccomp-dev libseccomp2:i386 jq
+    - yes US | openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout server.key -out server.crt
+test:
+  pre:
+    - yes US | openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout server.key -out server.crt
+    - node_modules/knex/lib/bin/cli.js migrate:latest
+    - docker info
+  override:
+    - npm test
+    - npm install -g codius
+    - docker build -t codius/codius-host:$CIRCLE_SHA1 .
+    - docker images
+    - docker run -d -p 8080:8080 codius/codius-host:$CIRCLE_SHA1; sleep 5
+    - ./test-contract-upload.sh 
+deployment:
+  docker:
+    branch: dockerci
+    commands:
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      - docker tag codius/codius-host:$CIRCLE_SHA1 codius/codius-host:latest
+      - docker push codius/codius-host:$CIRCLE_SHA1
+      - docker push codius/codius-host:latest

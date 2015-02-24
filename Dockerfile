@@ -1,4 +1,4 @@
-FROM dockerfile/nodejs
+FROM codius/codius.org:base
 
 # Install NPM dependencies
 # We do this first so that it can be cached even if the rest of the
