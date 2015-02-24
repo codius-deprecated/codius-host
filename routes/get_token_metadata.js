@@ -1,6 +1,7 @@
 var Token          = require('../models/token').model;
 var Bitcoin        = require('../lib/bitcoin');
 var config         = require('../lib/config');
+var amortizer      = require('../lib/amortizer');
 var BillingService = require('../lib/billing_service');
 var features       = require('../lib/features');
 var _              = require('lodash')
@@ -36,7 +37,14 @@ module.exports = function(req, res, next) {
               return address.related('ledger').get('name')+':'+address.get('address')
             })
           }
-          res.status(200).json(metadata);
+          if (features.isEnabled('BILLING_GENERIC')) {
+            amortizer.checkTokenBalance(model).then(function(balance){
+              metadata.compute_units = balance;
+              res.status(200).json(metadata);
+            });
+          } else {
+            res.status(200).json(metadata);
+          }
         })
       })
     }
