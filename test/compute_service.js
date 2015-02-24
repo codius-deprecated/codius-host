@@ -56,10 +56,8 @@ describe('Compute Service', function() {
   after(function(done) {
     // TODO: Remove contract from filesystem
     contract.destroy().then(function(){
-      token.destroy().then(function() {
-        done();
-      });
-    });
+      return token.destroy()
+    }).then(function() {done();}).catch(function(e) {done(e);});
   });
 
   it('should start a new running instance', function(done) {
