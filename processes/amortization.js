@@ -19,8 +19,6 @@
 
 module.exports = function(codius) {
 
-  if (codius.features.isEnabled('BILLING_GENERIC')) {
-    codius.amortizer.startPollingRunningInstances(100);
-  }
+  codius.amortizer.startPollingRunningInstances(100);
 }
 

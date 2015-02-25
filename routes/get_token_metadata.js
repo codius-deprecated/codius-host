@@ -1,8 +1,5 @@
 var Token          = require('../models/token').model;
-var Bitcoin        = require('../lib/bitcoin');
-var config         = require('../lib/config');
 var amortizer      = require('../lib/amortizer');
-var BillingService = require('../lib/billing_service');
 var features       = require('../lib/features');
 var _              = require('lodash')
 
@@ -25,28 +22,21 @@ module.exports = function(req, res, next) {
       });
       return;
     } else {
-      new BillingService().getBalance(model).then(function(balance) {
-        var metadata = {
-          token: token,
-          hash: model.related('contract').get('hash'),
-          compute_units: balance.get('balance')
-        }
+      var metadata = {
+        token: token,
+        hash: model.related('contract').get('hash')
+      }
+      amortizer.checkTokenBalance(model).then(function(balance){
+        metadata.compute_units = balance;
         model.related('addresses').fetch({ withRelated: ['ledger'] }).then(function(addresses) {
           if (addresses.models.length > 0) {
             metadata.payment_addresses = _.map(addresses.models, function(address) {
               return address.related('ledger').get('name')+':'+address.get('address')
             })
           }
-          if (features.isEnabled('BILLING_GENERIC')) {
-            amortizer.checkTokenBalance(model).then(function(balance){
-              metadata.compute_units = balance;
-              res.status(200).json(metadata);
-            });
-          } else {
-            res.status(200).json(metadata);
-          }
-        })
-      })
+          res.status(200).json(metadata);
+        });
+      });
     }
   });
 };
