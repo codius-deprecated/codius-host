@@ -8,6 +8,14 @@ function list(val) {
 }
 
 program
+  .on('--help', function() {
+    console.log('Environment variables:');
+    console.log('\tSSL_CERT\t\t- SSL certificate to use');
+    console.log('\tSSL_KEY\t\t\t- SSL key to use');
+    console.log('\tCONTRACTS_STORAGE\t- Directory to store contracts in');
+  });
+
+program
   .option('-f, --features <features>', 'List of features', list)
 
 program
