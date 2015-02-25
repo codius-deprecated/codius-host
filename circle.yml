@@ -18,7 +18,7 @@ test:
     - npm install -g codius
     - docker build -t codius/codius-host:$CIRCLE_SHA1 .
     - docker images
-    - docker run -v /tmp/contracts:/contracts -e SSL_KEY=/contracts/server.key -e SSL_CERT=/contracts/server.crt -d -p 8081:8080 codius/codius-host:$CIRCLE_SHA1; sleep 5
+    - docker run -v /tmp/contracts:/contracts -e SSL_KEY=/contracts/server.key -e SSL_CERT=/contracts/server.crt -d -p 8080:8080 codius/codius-host:$CIRCLE_SHA1; sleep 5
     - ./test-contract-upload.sh 
 deployment:
   docker:
