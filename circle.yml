@@ -9,9 +9,9 @@ dependencies:
     - sudo apt-get install libseccomp-dev libseccomp2:i386 jq
 test:
   pre:
+    - mkdir -p /tmp/contracts/
     - yes US | openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /tmp/contracts/server.key -out /tmp/contracts/server.crt
     - node_modules/knex/lib/bin/cli.js migrate:latest
-    - mkdir -p /tmp/contracts/
     - docker info
   override:
     - SSL_KEY=/tmp/contracts/server.key SSL_CERT=/tmp/contracts/server.crt CONTRACTS_STORAGE=/tmp/contracts/ npm test
@@ -22,7 +22,7 @@ test:
     - ./test-contract-upload.sh 
 deployment:
   docker:
-    branch: dockerci
+    branch: master
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
       - docker tag codius/codius-host:$CIRCLE_SHA1 codius/codius-host:latest
