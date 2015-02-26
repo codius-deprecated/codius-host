@@ -16,13 +16,14 @@
     OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 //==============================================================================
+var path     = require('path');
+var tokenLib = require(path.join(__dirname, '/../lib/token'));
 
-var tokenLib = require('../lib/token');
-
-var Token    = require('../models/token').model;
-var Contract = require('../models/contract').model;
-var Balance  = require('../models/balance').model;
-var engine   = require('../lib/engine');
+var Token    = require(path.join(__dirname, '/../models/token')).model;
+var Contract = require(path.join(__dirname, '/../models/contract')).model;
+var Balance  = require(path.join(__dirname, '/../models/balance')).model;
+var BillingService = require(path.join(__dirname, '/../lib/billing_service'));
+var engine   = require(path.join(__dirname, '/../lib/engine'));
 
 /**
  * Request a token.
@@ -53,11 +54,11 @@ module.exports = function (req, res) {
       // TODO: clean up this mess of returns
       return getUniqueToken().then(function (token) {
         return Token.forge({token: token, contract_id: contract.get('id')}).save().then(function(token){
-          return token.getBalance().then(function (balance) {
-            balance.set({balance: config.get('starting_cpu_balance')});
-            balance.save();
-            return token;
-          });
+          if (config.get('starting_cpu_balance') > 0) {
+            return new BillingService().credit(token, config.get('starting_cpu_balance')).then(function() {
+              return token;
+            });
+          } else return token;
         });
       }).then(function (token) {
         // All done!

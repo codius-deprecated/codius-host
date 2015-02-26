@@ -1,5 +1,5 @@
-var bookshelf = require('../lib/db').bookshelf;
 var path      = require('path');
+var bookshelf = require(path.join(__dirname, '/../lib/db')).bookshelf;
 var Promise   = require('bluebird');
 
 var Debit = bookshelf.Model.extend({

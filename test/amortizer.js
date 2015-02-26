@@ -1,18 +1,13 @@
 var uuid       = require('uuid');
 var path       = require('path');
 var Token      = require(path.join(__dirname, '/../models/token')).model;
-var Amortizer  = require(path.join(__dirname, '/../lib/amortizer')).Amortizer;
+var amortizer  = require(path.join(__dirname, '/../lib/amortizer'));
 var assert     = require('assert');
 
 describe('Amortizer', function() {
-  var amortizer, token, startTime, startBalance;
+  var token, startTime, startBalance;
 
   before(function(done) {
-    amortizer = new Amortizer({
-      pollInterval: 100,
-      millisecondsPerComputeUnit: 100
-    });
-    amortizer.stopPollingRunningInstances();
     startTime = Date.now();
     startBalance = 10;
     amortizer._instances[token] = {
@@ -41,7 +36,7 @@ describe('Amortizer', function() {
 
   it('should check a token\'s balance from the database', function(done) {
     new Token({ token: uuid.v4() }).save().then(function(token_) {
-      amortizer.checkTokenBalance(token_.get('token')).then(function(balance) {
+      amortizer.checkTokenBalance(token_).then(function(balance) {
         assert.strictEqual(balance, 0);
       })
       .then(function() {
@@ -54,14 +49,14 @@ describe('Amortizer', function() {
 
   it('should calculate the amount to charge a running instance', function(done) {
 
-    var charge = amortizer.calculateCharge(token.get('token'));
+    var charge = amortizer.calculateCharge(token);
     assert(charge <= Math.ceil((Date.now() - startTime) / 100));
     done();
   });
 
   it('should charge a running instance\'s balance', function(done) {
 
-    amortizer.chargeToken(token.get('token')).then(function(balance) {
+    amortizer.chargeToken(token).then(function(balance) {
       assert(startBalance - Math.ceil((Date.now() - startTime) / 100) <= balance);
       startBalance = balance;
       done();
@@ -70,7 +65,7 @@ describe('Amortizer', function() {
 
   it('should check a running instance\'s current balance', function(done) {
 
-    amortizer.checkTokenBalance(token.get('token')).then(function(balance) {
+    amortizer.checkTokenBalance(token).then(function(balance) {
       assert(startBalance - Math.ceil((Date.now() - startTime) / 100) <= balance);
       done();
     });

@@ -8,7 +8,11 @@ module.exports = function(codius) {
     codius.logger.info('Codius Compute Service listening on port', port)
   })
 
-  codius.events.on('contract:created', function(token){
-    codius.compute.startInstance(token.get('token'));
+  codius.events.on('balance:credited', function(balance){
+    new codius.Token({id: balance.get('token_id')}).fetch().then(function(token) {
+      if (!(token.get('token') in codius.compute._runningInstances)) {
+        codius.compute.startInstance(token);
+      }
+    })
   });
 }
