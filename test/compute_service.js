@@ -62,7 +62,7 @@ describe('Compute Service', function() {
 
   it('should start a new running instance', function(done) {
 
-    expect(compute.startInstance(token.get('token')).then(function(instance) {
+    expect(compute.startInstance(token).then(function(instance) {
       assert.strictEqual(instance.token, token.get('token'));
       assert.strictEqual(instance.container_hash, contractHash);
       assert.strictEqual(instance.state, 'running');
@@ -81,7 +81,7 @@ describe('Compute Service', function() {
 
   it('should get info on single running instance', function(done) {
 
-    expect(compute.getInstance(token.get('token')).then(function(instance) {
+    expect(compute.getInstance(token).then(function(instance) {
       assert.strictEqual(instance.token, token.get('token'));
       assert.strictEqual(instance.container_hash, contractHash);
       assert.strictEqual(instance.state, 'running');
@@ -90,7 +90,7 @@ describe('Compute Service', function() {
 
   it('should stop a running instance', function(done) {
 
-    expect(compute.stopInstance(token.get('token')).then(function(state) {
+    expect(compute.stopInstance(token).then(function(state) {
       assert.strictEqual(state, 'stopping');
     })).to.notify(done);
   });
