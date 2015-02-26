@@ -3,10 +3,12 @@ machine:
     - docker
 dependencies:
   pre:
-    - sudo apt-get update
-    - sudo apt-get install multiarch-support
-    - sudo apt-get update
-    - sudo apt-get install libseccomp-dev libseccomp2:i386 jq
+    - sudo apt-get update -qq
+    - sudo apt-get install -qq multiarch-support software-properties-common
+    - sudo apt-add-repository -y ppa:ansible/ansible
+    - sudo apt-get update -qq
+    - sudo apt-get install -qq libseccomp-dev libseccomp2:i386 jq ansible
+    - sudo pip install awscli boto
 test:
   pre:
     - mkdir -p /tmp/contracts/
@@ -28,3 +30,4 @@ deployment:
       - docker tag codius/codius-host:$CIRCLE_SHA1 codius/codius-host:latest
       - docker push codius/codius-host:$CIRCLE_SHA1
       - docker push codius/codius-host:latest
+      - ./deploy-to-testnet.sh
