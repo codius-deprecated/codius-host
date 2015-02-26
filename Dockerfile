@@ -8,9 +8,12 @@ WORKDIR /code
 RUN npm install --no-color
 
 # Add rest of application
+ENV PORT 8080
+ENV CONTRACTS_STORAGE /contracts/
+EXPOSE 8080
+VOLUME ["/contracts"]
+
 ADD . /code
 
-ENV PORT 8080
-EXPOSE 8080
-
-CMD npm start
+ENTRYPOINT ["/usr/local/bin/node", "bin/codius-host"]
+CMD ["start"]
