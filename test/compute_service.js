@@ -46,6 +46,10 @@ describe('Compute Service', function() {
         contract = _contract;
         return new Token({ token: uuid.v4(), contract_id: contract.get('id')}).save().then(function(token_) {
           token = token_;
+          compute._instances[token.get('token')] = {
+            state: 'pending',
+            container_hash: contract.get('hash')
+          }
         });
       })
     );
