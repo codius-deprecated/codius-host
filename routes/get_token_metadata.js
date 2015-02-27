@@ -1,7 +1,9 @@
-var Token          = require('../models/token').model;
-var amortizer      = require('../lib/amortizer');
-var features       = require('../lib/features');
-var _              = require('lodash')
+var path       = require('path');
+var Token      = require(path.join(__dirname, '/../models/token')).model;
+var amortizer  = require(path.join(__dirname, '/../lib/amortizer'));
+var features   = require(path.join(__dirname, '/../lib/features'));
+var request    = require('request')
+var _          = require('lodash')
 
 module.exports = function(req, res, next) {
 
@@ -34,9 +36,18 @@ module.exports = function(req, res, next) {
               return address.related('ledger').get('name')+':'+address.get('address')
             })
           }
-          res.status(200).json(metadata);
+          var getInstanceUrl = 'http://127.0.0.1:' + ((parseInt(process.env.PORT) || 5000) + 30) + '/instances/' + token;
+          request.get(getInstanceUrl, function(err, result, body) {
+            if (!err && result.statusCode == 200) {
+              var instance = JSON.parse(body).instance;
+              if (instance && instance.state) {
+                metadata.state = instance.state;
+              }
+            }
+            res.status(200).json(metadata);
+          })
         });
-      });
+      })
     }
   });
 };
