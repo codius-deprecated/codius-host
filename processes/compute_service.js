@@ -9,7 +9,6 @@ module.exports = function(codius) {
   })
 
   codius.events.on('contract:created', function(token) {
-    console.log('contract:created')
     if (token.get('token') in codius.compute._instances) {
       codius.logger.debug('Created token already a compute instance:', token.get('token'));
       return;
