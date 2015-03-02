@@ -6,7 +6,7 @@
   "scripts": {
     "start": "bin/codius-host start",
     "keygen": "openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout server.key -out server.crt",
-    "test": "mocha -R spec test/ test/models/*.js test/http/*.js"
+    "test": "istanbul cover _mocha -- -R spec test/ test/models/*.js test/http/*.js"
   },
   "bin": {
     "codius-host": "bin/codius-host"
