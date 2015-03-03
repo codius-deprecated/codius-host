@@ -11,48 +11,54 @@ var codius    = require(path.join(__dirname, '/../../'))
 var engine    = require(path.join(__dirname, '/../../lib/engine'))
 var Server    = require(path.join(__dirname, '/../../compute-service/server'));
 var Contract  = require(path.join(__dirname, '/../../models/contract')).model
+var temp      = require('temp');
+
+temp.track();
 
 describe('Compute Service HTTP Interface', function() {
   var contract, token, contractHash, server, http;
 
   before(function() {
-    var fileManager = engine.fileManager;
-    var compiler = engine.compiler;
-    var currentDir = path.join(__dirname, '/../test_contract');
-    var p = [];
+    return Promise.promisify(temp.mkdir)('codius-host-test').then(function(dir) {
+      engine.engineConfig.contractsFilesystemPath = dir;
+      var fileManager = engine.fileManager;
+      var compiler = engine.compiler;
+      var currentDir = path.join(__dirname, '/../test_contract');
+      var p = [];
 
-    compiler.on('file', function (event) {
-      if (event.name.indexOf(currentDir) !== 0) {
-        throw new Error('File path does not have current directory prefix: ' + event.name);
-      }
-      p.push(fileManager.storeFileWithHash(event.hash, event.data));
-    });
-
-    contractHash = compiler.compileModule(currentDir);
-
-    p.push(new Contract({hash: contractHash}).fetch()
-      .then(function (_contract) {
-        if (_contract) {
-          return _contract;
-        } else {
-          return Contract.forge({
-            hash: contractHash
-          }).save();
+      compiler.on('file', function (event) {
+        if (event.name.indexOf(currentDir) !== 0) {
+          throw new Error('File path does not have current directory prefix: ' + event.name);
         }
-      }).then(function (_contract) {
-        contract = _contract;
-        return new codius.Token({ token: uuid.v4(), contract_id: contract.get('id')}).save()
-        .then(function(token_) {
-          token = token_;
-          codius.compute._instances[token.get('token')] = {
-            state: 'pending',
-            container_hash: contract.get('hash')
-          }
-        });
-      })
-    );
+        p.push(fileManager.storeFileWithHash(event.hash, event.data));
+      });
 
-    return Promise.all(p);
+      contractHash = compiler.compileModule(currentDir);
+
+      p.push(new Contract({hash: contractHash}).fetch()
+        .then(function (_contract) {
+          if (_contract) {
+            return _contract;
+          } else {
+            return Contract.forge({
+              hash: contractHash
+            }).save();
+          }
+        }).then(function (_contract) {
+          contract = _contract;
+          return new codius.Token({ token: uuid.v4(), contract_id: contract.get('id')}).save()
+          .then(function(token_) {
+            token = token_;
+            codius.compute._instances[token.get('token')] = {
+              state: 'pending',
+              container_hash: contract.get('hash')
+            }
+          });
+        })
+      );
+
+      return Promise.all(p);
+    });
   });
 
   beforeEach(function() {

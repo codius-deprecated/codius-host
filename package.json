@@ -41,7 +41,8 @@
     "sinon": "~1.10.2",
     "sinon-chai": "~2.5.0",
     "sqlite3": "^2.2.4",
-    "supertest-as-promised": "^1.0.0"
+    "supertest-as-promised": "^1.0.0",
+    "temp": "^0.8.1"
   },
   "dependencies": {
     "base64url": "0.0.6",
