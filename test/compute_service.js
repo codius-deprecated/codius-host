@@ -36,9 +36,9 @@ describe('Compute Service', function() {
       var fileManager = engine.fileManager;
       var compiler = engine.compiler;
       var currentDir = path.join(__dirname, '/test_contract');
-      var p = [];
       
       return db.knex.migrate.latest(db.conf).then(function () {
+        var p = [];
         compiler.on('file', function (event) {
           if (event.name.indexOf(currentDir) !== 0) {
             throw new Error('File path does not have current directory prefix: ' + event.name);

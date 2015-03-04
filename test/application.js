@@ -1,3 +1,8 @@
+var nconf      = require('../lib/config');
+nconf.set('db:connection:filename', ':memory:');
+
+var db         = require('../lib/db');
+
 var CodiusHost = require(__dirname+'/../');
 var express    = require('express');
 var sinon      = require('sinon');
@@ -9,9 +14,19 @@ describe('Codius Host Express Application', function() {
   var application, http, token;
 
   before(function() {
-    application = new CodiusHost.Application();
-    http        = supertest(application);
+    return db.knex.migrate.rollback(db.conf);
   })
+
+  beforeEach(function() {
+    return db.knex.migrate.latest(db.conf).then(function() {
+      application = new CodiusHost.Application();
+      http        = supertest(application);
+    });
+  });
+
+  afterEach(function() {
+    return db.knex.migrate.rollback(db.conf);
+  });
 
   it('should initialize an express application', function() {
     assert.strictEqual(typeof application.listen, 'function');
