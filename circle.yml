@@ -1,3 +1,6 @@
+general:
+  artifacts:
+    - "coverage/lcov-report"
 machine:
   services:
     - docker
