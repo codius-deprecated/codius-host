@@ -52,9 +52,20 @@ describe('Codius Host Express Application', function() {
   });
 
   it('should expose a contract metadata route', function() {
-    return http
-      .get('/token/'+token)
-      .expect(200);
+    var contractHash = '427c7a0bfa92621f93fac7ed35e42a6d4fc4fef522b89ade12776367399014ef';
+    return new Contract({hash: contractHash}).save().then(function (contract) {
+      return http
+        .post('/token?contract='+contractHash)
+        .expect(200)
+        .then(function(response) {
+          token = response.body.token;
+          return http
+            .get('/token/'+token)
+            .expect(200).then(function() {
+              return contract.destroy();
+            });
+        });
+    })
   });
 
   it.skip('should not upload an empty contract', function() {
