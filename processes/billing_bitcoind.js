@@ -19,7 +19,7 @@
 
 module.exports = function(codius) {
 
-  if (codius.features.isEnabled('BILLING_BITCOIND')) {
+  if (codius.features.isEnabled('BITCOIN_BILLING')) {
 
     // during development of this feature use a path to the module instead of npm
     var library = process.env['CODIUS_BILLING_BITCOIND_PATH'] || 'codius-billing-bitcoind'
