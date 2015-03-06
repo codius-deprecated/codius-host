@@ -5,7 +5,7 @@ var features = require('../lib/features')
 
 module.exports = function(req, res) {
   fs.readFile(path.join(__dirname+'/../package.json'), function(error, packagejson) {
-    fs.readFile(config.get('SSL_CERT'), function(error, certificate) {
+    fs.readFile(config.get('ssl:cert'), function(error, certificate) {
 
       var properties = {
           documentation: "https://codius.org/docs/using-codius/getting-started",

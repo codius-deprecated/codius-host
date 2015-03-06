@@ -1,66 +1,80 @@
+var nconf      = require('../lib/config');
+nconf.set('db:connection:filename', ':memory:');
+
+var db         = require('../lib/db');
+
 var CodiusHost = require(__dirname+'/../');
 var express    = require('express');
 var sinon      = require('sinon');
 var assert     = require('assert');
-var supertest  = require('supertest');
+var supertest  = require('supertest-as-promised');
 var Contract   = require(__dirname+'/../models/contract').model;
 
 describe('Codius Host Express Application', function() {
   var application, http, token;
 
   before(function() {
-    application = new CodiusHost.Application();
-    http        = supertest(application);
+    return db.knex.migrate.rollback(db.conf);
   })
+
+  beforeEach(function() {
+    return db.knex.migrate.latest(db.conf).then(function() {
+      application = new CodiusHost.Application();
+      http        = supertest(application);
+    });
+  });
+
+  afterEach(function() {
+    return db.knex.migrate.rollback(db.conf);
+  });
 
   it('should initialize an express application', function() {
     assert.strictEqual(typeof application.listen, 'function');
   });
 
-  it('should expose a health check route', function(done) {
-    http
+  it('should expose a health check route', function() {
+    return http
       .get('/health')
-      .expect(200)
-      .end(function(error, response) {
-        assert.strictEqual(response.statusCode, 200);
-        done();
-      });
+      .expect(200);
   });
 
-  it('should expose a token generation route', function(done) {
+  it('should expose a token generation route', function() {
     var contractHash = '427c7a0bfa92621f93fac7ed35e42a6d4fc4fef522b89ade12776367399014ef';
-    new Contract({hash: contractHash}).save().then(function (contract) {
-      http
+    return new Contract({hash: contractHash}).save().then(function (contract) {
+      return http
         .post('/token?contract='+contractHash)
         .expect(200)
-        .end(function(error, response) {
-          assert.strictEqual(response.statusCode, 200);
+        .then(function(response) {
           token = response.body.token;
-          contract.destroy().then(function() {
-            done();
-          });
+          return contract.destroy();
         });
     })
   });
 
-  it('should expose a contract metadata route', function(done) {
-    http
-      .get('/token/'+token)
-      .expect(200)
-      .end(function(error, response) {
-        assert.strictEqual(response.statusCode, 200);
-        done();
-      });
+  it('should expose a contract metadata route', function() {
+    var contractHash = '427c7a0bfa92621f93fac7ed35e42a6d4fc4fef522b89ade12776367399014ef';
+    return new Contract({hash: contractHash}).save().then(function (contract) {
+      return http
+        .post('/token?contract='+contractHash)
+        .expect(200)
+        .then(function(response) {
+          token = response.body.token;
+          return http
+            .get('/token/'+token)
+            .expect(200).then(function() {
+              return contract.destroy();
+            });
+        });
+    })
   });
 
-  it.skip('should not upload an empty contract', function(done) {
-    http
+  it.skip('should not upload an empty contract', function() {
+    return http
       .post('/contract')
-      .end(function(error, response) {
+      .expect(500)
+      .then(function(response) {
         assert.strictEqual(response.body.success, false);
         assert.strictEqual(response.body.error, 'no contract provided');
-        assert.strictEqual(response.body.statusCode, 500);
-        done();
       });
   });
 });

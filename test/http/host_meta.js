@@ -1,3 +1,5 @@
+var nconf     = require('../../lib/config');
+var Promise   = require('bluebird').Promise;
 var codius    = require('../../')
 var assert    = require('assert')
 var supertest = require('supertest')
@@ -5,13 +7,21 @@ var server    = require('../../lib/application')(codius)
 var http      = supertest(server)
 var fs        = require('fs')
 var path      = require('path')
+var genkey    = require('../genkey');
 
 describe('Host Meta and Root Endpoints', function() {
   var version, publicKey
 
   before(function() {
-    version   = JSON.parse(fs.readFileSync(path.join(__dirname+'/../../package.json')).toString()).version
-    publicKey = fs.readFileSync(codius.config.get('SSL_CERT')).toString()
+    version   = JSON.parse(fs.readFileSync(path.join(__dirname+'/../../package.json')).toString()).version;
+  });
+
+  beforeEach(function() {
+    return genkey().then(function(v) {
+      publicKey = v.certContents;
+      nconf.set('ssl:cert', v.certPath);
+      nconf.set('ssl:key', v.keyPath);
+    });
   })
 
   it('should redirect the root to host meta', function(done) {
