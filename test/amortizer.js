@@ -67,7 +67,6 @@ describe('Amortizer', function() {
     return Promise.delay(10).then(function() {
       return amortizer.chargeToken(token).then(function(balance) {
         assert(startBalance - Math.ceil((Date.now() - startTime) / 100) <= balance);
-        startBalance = balance;
       });
     });
   });
