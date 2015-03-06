@@ -27,7 +27,7 @@ module.exports = function(codius) {
     const RIPPLE_REST_URL      = 'https://api.ripple.com/'
     const ADDRESS              = codius.config.get('RIPPLE_ADDRESS')
     const billing              = new codius.BillingService()
-    const CPU_PER_DROP         = codius.config.get('compute_units_per_drop')
+    const CPU_PER_XRP          = codius.config.get('compute_units_per_xrp')
     const CPU_PER_BITCOIN      = codius.config.get('compute_units_per_bitcoin')
 
     if (!ADDRESS) {
@@ -71,8 +71,8 @@ module.exports = function(codius) {
       return new Promise(function(resolve, reject) {
         if (payment.DestinationTag) {
           var CPU
-          if (!payment.Amount.currency) { // XRP
-            CPU = payment.Amount * CPU_PER_DROP
+          if (!payment.Amount.currency) { // XRP (in drops)
+            CPU = payment.Amount / 1000000 * CPU_PER_XRP
           } else if (payment.Amount.currency === 'BTC') {
             CPU = payment.Amount.value * CPU_PER_BITCOIN
           }

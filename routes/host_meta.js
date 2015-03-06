@@ -17,7 +17,7 @@ module.exports = function(req, res) {
       if (features.isEnabled('RIPPLE_BILLING')) {
         properties.billing.push({
           network: 'ripple',
-          cpu_per_xrp: parseFloat(config.get('compute_units_per_drop')) * 1000000
+          cpu_per_xrp: parseFloat(config.get('compute_units_per_xrp'))
         })
       }
 
