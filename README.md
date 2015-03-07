@@ -56,6 +56,14 @@ sudo apt-get install nodejs
 sudo ln -s /usr/bin/nodejs /usr/local/bin/node
 ```
 
+### sqlite3
+
+Install sqlite3 by running:
+
+``` sh
+sudo npm install -g sqlite3
+```
+
 ## Installation
 
 ``` sh
