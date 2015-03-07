@@ -1,4 +1,4 @@
-git clone git@github.com:tdfischer/rippled-skynet skynet
+git clone git@github.com:codius/rippled-skynet skynet
 cd skynet
 git submodule update --init
 chmod a-rwx,u+r keys/*
