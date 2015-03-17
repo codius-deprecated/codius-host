@@ -147,3 +147,24 @@ codius-host start --features my_cool_feature
 
 codius-host start -f feature_one,feature_two
 ````
+
+## Docker Container
+
+codius-host is also released as a docker container. You can pull it down via:
+
+```
+docker pull codius/codius-host
+```
+
+And it can be started with:
+
+```
+docker run codius/codius-host --help
+```
+
+The docker container uses two environment variables:
+
+* PORT - The port that the container will listen on within the container. Defaults to 8080.
+* CONTRACTS_STORAGE - Location within the container that contracts will be
+  saved. Defaults to /contracts/. You can mount a local filesystem on top of it
+  by passing ```-v /path/to/storage:/contracts``` to your ```docker run``` command.
